@@ -614,7 +614,7 @@ final class AppModel: ObservableObject {
                 .filter { !skipped.contains($0.id) }
             metadataRemaining = films.filter { $0.metadataVersion < MetadataService.currentVersion && !$0.isMissing && roots[$0.locationId] != nil }.count
             guard !batch.isEmpty else { break }
-            let roots = self.roots
+            let rootSnapshot = self.roots
             let preference = settings.coverPreference
             let service = metadata
             var index = 0
@@ -623,7 +623,7 @@ final class AppModel: ObservableObject {
                 index += slice.count
                 await withTaskGroup(of: (Int64, Bool).self) { group in
                     for film in slice {
-                        guard let root = roots[film.locationId] else { skipped.insert(film.id); continue }
+                        guard let root = rootSnapshot[film.locationId] else { skipped.insert(film.id); continue }
                         group.addTask {
                             let outcome = await service.process(film, locationRoot: root, preference: preference)
                             return (film.id, outcome != nil)
