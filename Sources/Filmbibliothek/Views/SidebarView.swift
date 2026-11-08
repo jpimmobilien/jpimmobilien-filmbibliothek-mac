@@ -148,10 +148,11 @@ struct SidebarRow: View {
             HStack(spacing: 10) {
                 Image(systemName: systemImage)
                     .font(.system(size: 12.5, weight: .medium))
-                    .foregroundColor(selected ? p.accent : color.opacity(0.9))
+                    // Wie in der Vorlage: Symbole einfarbig grau, nur die Auswahl in Blau
+                    .foregroundColor(selected ? p.accent : p.textSecondary)
                     .frame(width: 18)
                 Text(title)
-                    .font(.system(size: 13, weight: selected ? .semibold : .medium))
+                    .font(.system(size: 12.5, weight: selected ? .semibold : .regular))
                     .foregroundColor(p.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.middle)

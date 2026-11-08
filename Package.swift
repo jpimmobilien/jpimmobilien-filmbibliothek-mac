@@ -19,6 +19,11 @@ let vlcKitPath = "Vendor/VLCKit.xcframework"
 let hasVLCKit = FileManager.default.fileExists(atPath: Context.packageDirectory + "/" + vlcKitPath)
 
 var serviceDependencies: [Target.Dependency] = ["FBCore", "FBStore"]
+// Bibliotheken für das Xcode-Projekt (project.yml → Filmbibliothek.xcodeproj); die App selbst ist ein eigenes Ziel
+var products: [Product] = [
+    .library(name: "FBCore", targets: ["FBCore"]),
+    .library(name: "FBStore", targets: ["FBStore"]),
+]
 var targets: [Target] = [
     .systemLibrary(name: "CSQLite", path: "Sources/CSQLite"),
     .target(name: "FBCore", path: "Sources/FBCore"),
@@ -46,6 +51,7 @@ targets.append(
         ]
     )
 )
+products.append(.library(name: "FBServices", targets: ["FBServices"]))
 targets.append(
     .executableTarget(
         name: "Filmbibliothek",
@@ -72,5 +78,6 @@ let package = Package(
     name: "Filmbibliothek",
     defaultLocalization: "de",
     platforms: [.macOS(.v13)],
+    products: products,
     targets: targets
 )

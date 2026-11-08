@@ -175,7 +175,7 @@ public enum VLCSupport {
                 thumbnailer = t
                 // Eigene Obergrenze zusätzlich zur VLCKit-Zeitüberschreitung
                 timer = Timer.scheduledTimer(withTimeInterval: 8, repeats: false) { [weak self] _ in
-                    MainActor.assumeIsolated { self?.finish(nil) }
+                    Task { @MainActor in self?.finish(nil) }
                 }
                 t.fetchThumbnail()
             }
@@ -191,12 +191,12 @@ public enum VLCSupport {
         }
 
         nonisolated func mediaThumbnailerDidTimeOut(_ mediaThumbnailer: VLCMediaThumbnailer) {
-            DispatchQueue.main.async { MainActor.assumeIsolated { self.finish(nil) } }
+            Task { @MainActor in self.finish(nil) }
         }
 
         nonisolated func mediaThumbnailer(_ mediaThumbnailer: VLCMediaThumbnailer, didFinishThumbnail thumbnail: CGImage) {
             let image = thumbnail
-            DispatchQueue.main.async { MainActor.assumeIsolated { self.finish(image) } }
+            Task { @MainActor in self.finish(image) }
         }
     }
 }

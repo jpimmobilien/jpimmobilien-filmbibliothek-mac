@@ -63,9 +63,7 @@ enum QAScenario {
             CFNotificationCenterAddObserver(center, nil, { _, _, cfName, _, _ in
                 guard let raw = cfName?.rawValue else { return }
                 let n = raw as String
-                DispatchQueue.main.async {
-                    MainActor.assumeIsolated { QAScenario.handleRemote(n) }
-                }
+                Task { @MainActor in QAScenario.handleRemote(n) }
             }, name as CFString, nil, .deliverImmediately)
         }
     }

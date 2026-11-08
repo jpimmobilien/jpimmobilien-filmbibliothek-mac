@@ -75,6 +75,9 @@ final class AppModel: ObservableObject {
     @Published private(set) var collections: [FilmCollection] = []
     @Published private(set) var statistics: LibraryStore.Statistics?
     @Published private(set) var visibleFilms: [Film] = []
+    /// Formate im aktuellen Bereich mit Anzahl (Segment-Chips „Alle 22 · MP4 8 · MKV 3“) – ohne Formatfilter gezählt
+    @Published private(set) var scopeFormats: [FormatCount] = []
+    @Published private(set) var scopeTotal = 0
     @Published private(set) var isBootstrapped = false
 
     // Oberfläche
@@ -251,11 +254,15 @@ final class AppModel: ObservableObject {
         recomputeTask = Task { [weak self] in
             if debounce > 0 { try? await Task.sleep(nanoseconds: UInt64(debounce * 1_000_000_000)) }
             if Task.isCancelled { return }
-            let result = await Task.detached(priority: .userInitiated) { () -> [Film] in
+            let (result, formats, total) = await Task.detached(priority: .userInitiated) { () -> ([Film], [FormatCount], Int) in
                 let now = Date()
+                var counts: [String: Int] = [:]
+                var inScope = 0
                 var list = films.filter { f in
                     let avail = !f.isMissing && available.contains(f.locationId)
                     guard scope.contains(f, collections: collectionMap, isAvailable: avail, now: now) else { return false }
+                    inScope += 1
+                    counts[f.fileExtension, default: 0] += 1
                     guard filter.matches(f, isAvailable: avail) else { return false }
                     if !query.isEmpty {
                         return query.matches(normalized: SearchIndex.haystack(for: f, locationName: names[f.locationId] ?? ""))
@@ -263,10 +270,14 @@ final class AppModel: ObservableObject {
                     return true
                 }
                 list = LibrarySorter.sort(list, by: order)
-                return list
+                let formats = counts.map { FormatCount(ext: $0.key, count: $0.value) }
+                    .sorted { $0.count != $1.count ? $0.count > $1.count : $0.ext < $1.ext }
+                return (list, formats, inScope)
             }.value
             if Task.isCancelled { return }
             self?.visibleFilms = result
+            if self?.scopeFormats != formats { self?.scopeFormats = formats }
+            if self?.scopeTotal != total { self?.scopeTotal = total }
         }
     }
 
@@ -759,4 +770,11 @@ final class AppModel: ObservableObject {
         for (_, a) in accesses { a.stop() }
         accesses.removeAll()
     }
+}
+
+/// Anzahl je Dateiformat im aktuellen Bereich
+struct FormatCount: Identifiable, Equatable, Sendable {
+    let ext: String
+    let count: Int
+    var id: String { ext }
 }

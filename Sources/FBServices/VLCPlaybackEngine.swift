@@ -106,7 +106,7 @@ public final class VLCPlaybackEngine: NSObject, PlaybackEngine {
         if let s = startAt, s > 0 { media.addOption(":start-time=\(String(format: "%.3f", s))") }
         player.media = media
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.poll() }
+            Task { @MainActor in self?.poll() }
         }
         state = .ready
     }

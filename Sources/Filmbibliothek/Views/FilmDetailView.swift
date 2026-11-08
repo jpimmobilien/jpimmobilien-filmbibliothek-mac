@@ -52,7 +52,7 @@ struct FilmDetailView: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
                 Text(settings.displayTitle(film))
-                    .font(.system(size: 38, weight: .bold))
+                    .font(.system(size: 34, weight: .bold))
                     .lineLimit(3)
                     .minimumScaleFactor(0.7)
                     .textSelection(.enabled)
@@ -155,7 +155,7 @@ struct FilmDetailView: View {
     // MARK: - Infokarten
 
     private var infoCards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 700), spacing: 16, alignment: .top)], alignment: .leading, spacing: 16) {
+        MasonryLayout(minColumnWidth: 320, spacing: 16) {
             GlassCard(title: "Video", systemImage: "film", iconColor: p.accent) {
                 VStack(spacing: 9) {
                     InfoRow(label: "Auflösung", value: Fmt.resolution(film.info.width, film.info.height).map { r in film.resolutionClass.map { "\(r) (\($0.label))" } ?? r } ?? "–")

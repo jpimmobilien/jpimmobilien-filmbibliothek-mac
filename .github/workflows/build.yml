@@ -57,6 +57,20 @@ jobs:
         run: |
           set -o pipefail
           scripts/build_app.sh 2>&1 | tee logs/build-output.txt
+      - name: Xcode-Projekt erzeugen und damit bauen (XcodeGen)
+        id: xcodeproj
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          brew install xcodegen >/dev/null 2>&1 || true
+          xcodegen generate 2>&1 | tee logs/xcodegen.txt
+          xcodebuild -project Filmbibliothek.xcodeproj -scheme Filmbibliothek -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build/xcode build 2>&1 | tail -60 | tee logs/xcodebuild.txt
+          APPX="$(find build/xcode -name Filmbibliothek.app -path '*Release*' | head -1)"
+          echo "Xcode-Build: $APPX" | tee -a logs/xcodebuild.txt
+          lipo -archs "$APPX/Contents/MacOS/Filmbibliothek" | tee -a logs/xcodebuild.txt
+          codesign -d --entitlements - "$APPX" 2>&1 | tee -a logs/xcodebuild.txt
+          mkdir -p xcodeproj && cp -R Filmbibliothek.xcodeproj xcodeproj/
       - name: Swift-Tests (Apple Silicon)
         id: tests
         continue-on-error: true
@@ -64,7 +78,7 @@ jobs:
           FB_REQUIRE_VLC: "1"
         run: |
           set -o pipefail
-          swift test 2>&1 | tee logs/test-output.txt
+          scripts/run_tests.sh 2>&1 | tee logs/test-output.txt
       - name: Sandbox-Ablauf mit der echten App
         id: sandbox
         continue-on-error: true
@@ -131,6 +145,7 @@ jobs:
             logs/
             qa/
             snapshots/
+            xcodeproj/
           if-no-files-found: ignore
       - name: Fehlgeschlagene Prüfungen melden
         if: steps.tests.outcome == 'failure' || steps.sandbox.outcome == 'failure' || steps.snap_glass.outcome == 'failure' || steps.snap_fallback.outcome == 'failure'
@@ -234,7 +249,7 @@ jobs:
           FB_REQUIRE_VLC: "1"
         run: |
           set -o pipefail
-          swift test 2>&1 | tee logs/test-output-intel.txt
+          scripts/run_tests.sh 2>&1 | tee logs/test-output-intel.txt
       - name: App aus der DMG installieren
         run: |
           MNT="$(mktemp -d)"

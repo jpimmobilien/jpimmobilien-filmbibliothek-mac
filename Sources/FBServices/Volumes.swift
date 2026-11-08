@@ -181,7 +181,7 @@ public final class VolumeMonitor {
         func add(_ name: Notification.Name, _ make: @escaping (Notification) -> Event?) {
             observers.append(nc.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
                 guard let ev = make(note) else { return }
-                MainActor.assumeIsolated { self?.handler(ev) }
+                Task { @MainActor in self?.handler(ev) }
             })
         }
         add(NSWorkspace.didMountNotification) { n in (n.userInfo?[NSWorkspace.volumeURLUserInfoKey] as? URL).map(Event.mounted) }
@@ -191,7 +191,7 @@ public final class VolumeMonitor {
         add(NSWorkspace.didWakeNotification) { _ in .didWake }
         // Netzlaufwerke verschwinden manchmal ohne Meldung (WLAN weg) → regelmäßig nachsehen
         timer = Timer.scheduledTimer(withTimeInterval: periodicInterval, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.handler(.periodicCheck) }
+            Task { @MainActor in self?.handler(.periodicCheck) }
         }
     }
 

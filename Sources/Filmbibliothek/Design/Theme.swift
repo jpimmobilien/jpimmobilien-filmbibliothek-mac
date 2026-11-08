@@ -147,10 +147,10 @@ extension Color {
 // MARK: - Schrift
 
 enum Typo {
-    static let pageTitle = Font.system(size: 30, weight: .bold)
-    static let heroTitle = Font.system(size: 54, weight: .bold)
+    static let pageTitle = Font.system(size: 26, weight: .bold)
+    static let heroTitle = Font.system(size: 50, weight: .bold)
     static let pageSubtitle = Font.system(size: 13, weight: .regular)
-    static let cardTitle = Font.system(size: 14, weight: .semibold)
+    static let cardTitle = Font.system(size: 13.5, weight: .semibold)
     static let body = Font.system(size: 13)
     static let bodyStrong = Font.system(size: 13, weight: .semibold)
     static let caption = Font.system(size: 11.5)

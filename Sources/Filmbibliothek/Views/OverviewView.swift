@@ -127,7 +127,7 @@ struct OverviewView: View {
     // MARK: - Karten
 
     private var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300, maximum: 600), spacing: 16, alignment: .top)], alignment: .leading, spacing: 16) {
+        MasonryLayout(minColumnWidth: 300, spacing: 16) {
             libraryCard
             playbackCard
             formatsCard

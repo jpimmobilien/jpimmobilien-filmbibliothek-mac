@@ -157,18 +157,18 @@ public final class AVPlaybackEngine: NSObject, PlaybackEngine {
         let item = AVPlayerItem(asset: asset)
         self.item = item
         statusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in
-            DispatchQueue.main.async { MainActor.assumeIsolated { self?.statusChanged(item) } }
+            Task { @MainActor in self?.statusChanged(item) }
         }
         let nc = NotificationCenter.default
         notes.append(nc.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.state = .ended }
+            Task { @MainActor in self?.state = .ended }
         })
         notes.append(nc.addObserver(forName: .AVPlayerItemFailedToPlayToEndTime, object: item, queue: .main) { [weak self] n in
             let err = (n.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError)?.localizedDescription
-            MainActor.assumeIsolated { self?.fail(err) }
+            Task { @MainActor in self?.fail(err) }
         })
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.25, preferredTimescale: 600), queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.tick() }
+            Task { @MainActor in self?.tick() }
         }
         player.replaceCurrentItem(with: item)
         Task { [weak self] in await self?.loadDetails(asset: asset) }
@@ -223,7 +223,7 @@ public final class AVPlaybackEngine: NSObject, PlaybackEngine {
                     pendingStart = nil
                     player.seek(to: CMTime(seconds: SeekMath.clamp(s, duration: duration), preferredTimescale: 600),
                                 toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
-                        DispatchQueue.main.async { MainActor.assumeIsolated { if self?.wantsPlay == true { self?.play() } } }
+                        Task { @MainActor in if self?.wantsPlay == true { self?.play() } }
                     }
                 } else if wantsPlay {
                     play()

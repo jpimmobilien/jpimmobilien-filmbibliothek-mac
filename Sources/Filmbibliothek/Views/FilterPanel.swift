@@ -120,6 +120,8 @@ struct FilterPanel: View {
 struct FilterChips: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.palette) private var p
+    /// Format-Chips zeigen (aus, wenn die Segment-Chips das Format schon zeigen)
+    var includeExtensions = true
 
     var body: some View {
         let f = model.filter
@@ -131,8 +133,10 @@ struct FilterChips: View {
         ForEach(Array(f.locationIds).sorted(), id: \.self) { id in
             Chip(text: model.locationName(id), dot: p.accent) { model.filter.locationIds.remove(id) }
         }
-        ForEach(Array(f.extensions).sorted(), id: \.self) { e in
-            Chip(text: e.uppercased(), dot: p.violet) { model.filter.extensions.remove(e) }
+        if includeExtensions {
+            ForEach(Array(f.extensions).sorted(), id: \.self) { e in
+                Chip(text: e.uppercased(), dot: p.violet) { model.filter.extensions.remove(e) }
+            }
         }
         ForEach(Array(f.resolutions).sorted(), id: \.self) { r in
             Chip(text: r.label, dot: p.yellow) { model.filter.resolutions.remove(r) }

@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import FBCore
 
 // MARK: - Knöpfe
 
@@ -393,5 +394,80 @@ struct PosterPlaceholder: View {
             }
             .padding(10)
         }
+    }
+}
+
+// MARK: - Karten-Spalten (Vorlage: AETHER-Detailseiten – Karten oben bündig, unterschiedlich hoch)
+
+/// Verteilt Karten auf so viele Spalten, wie in die Breite passen; jede Karte kommt in die gerade kürzeste Spalte.
+/// So stehen alle Karten oben bündig, ohne Lücken durch unterschiedlich hohe Nachbarn (Layout-Protokoll, macOS 13+).
+struct MasonryLayout: Layout {
+    var minColumnWidth: CGFloat = 320
+    var spacing: CGFloat = 16
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? (minColumnWidth * 2 + spacing)
+        let (_, height) = arrange(width: width, subviews: subviews)
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let (frames, _) = arrange(width: bounds.width, subviews: subviews)
+        for (index, frame) in frames.enumerated() {
+            subviews[index].place(at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
+                                  anchor: .topLeading,
+                                  proposal: ProposedViewSize(width: frame.width, height: frame.height))
+        }
+    }
+
+    private func arrange(width: CGFloat, subviews: Subviews) -> ([CGRect], CGFloat) {
+        let usable = max(1, width)
+        let count = max(1, Int((usable + spacing) / (minColumnWidth + spacing)))
+        let columnWidth = (usable - CGFloat(count - 1) * spacing) / CGFloat(count)
+        var heights = Array(repeating: CGFloat(0), count: count)
+        var frames: [CGRect] = []
+        for subview in subviews {
+            let height = subview.sizeThatFits(ProposedViewSize(width: columnWidth, height: nil)).height
+            var column = 0
+            for i in 1..<count where heights[i] < heights[column] - 0.5 { column = i }
+            let y = heights[column] == 0 ? 0 : heights[column] + spacing
+            frames.append(CGRect(x: CGFloat(column) * (columnWidth + spacing), y: y, width: columnWidth, height: height))
+            heights[column] = y + height
+        }
+        return (frames, heights.max() ?? 0)
+    }
+}
+
+// MARK: - Segment-Chips mit Anzahl (Vorlage: AETHER „Alle 530 · Meine Prozesse 310 · System 500“)
+
+struct SegmentChip: View {
+    @Environment(\.palette) private var p
+    let title: String
+    let count: Int?
+    let selected: Bool
+    let action: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Text(title)
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundColor(selected ? p.onAccent : p.textPrimary)
+                if let count {
+                    Text(Fmt.integer(count))
+                        .font(.system(size: 10.5, weight: .medium).monospacedDigit())
+                        .foregroundColor(selected ? p.onAccent.opacity(0.8) : p.textTertiary)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4.5)
+            .background(Capsule(style: .continuous).fill(selected ? p.accent : (hover ? p.controlHover : p.control)))
+            .overlay(Capsule(style: .continuous).strokeBorder(selected ? Color.white.opacity(0.18) : p.hairline, lineWidth: 0.6))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .animation(.easeOut(duration: 0.12), value: selected)
     }
 }

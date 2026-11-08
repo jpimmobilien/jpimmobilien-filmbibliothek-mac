@@ -18,7 +18,12 @@ struct LibraryView: View {
                 .padding(.horizontal, 30)
                 .padding(.top, 24)
                 .padding(.bottom, 12)
-            if !model.filter.isEmpty || !model.searchText.isEmpty || folderPath != nil {
+            if model.scopeFormats.count > 1 {
+                formatChips
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 10)
+            }
+            if otherFiltersActive || !model.searchText.isEmpty || folderPath != nil {
                 chipsRow
                     .padding(.horizontal, 30)
                     .padding(.bottom, 10)
@@ -172,6 +177,30 @@ struct LibraryView: View {
 
     // MARK: - Chips
 
+    /// Filter außer dem Format aktiv? (das Format steht schon in den Segment-Chips)
+    private var otherFiltersActive: Bool {
+        var f = model.filter
+        if model.scopeFormats.count > 1 { f.extensions = [] }
+        return !f.isEmpty
+    }
+
+    /// Segment-Chips wie in der Vorlage: „Alle 22 · MP4 8 · MKV 3 …“ – ein Klick filtert nach dem Format
+    private var formatChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                SegmentChip(title: "Alle", count: model.scopeTotal, selected: model.filter.extensions.isEmpty) {
+                    model.filter.extensions = []
+                }
+                ForEach(model.scopeFormats) { fc in
+                    SegmentChip(title: fc.ext.uppercased(), count: fc.count, selected: model.filter.extensions == [fc.ext]) {
+                        model.filter.extensions = model.filter.extensions == [fc.ext] ? [] : [fc.ext]
+                    }
+                }
+            }
+            .padding(.vertical, 1)
+        }
+    }
+
     private var chipsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
@@ -189,7 +218,7 @@ struct LibraryView: View {
                 if !model.searchText.isEmpty {
                     Chip(text: "Suche: \(model.searchText)", dot: p.accent) { model.searchText = "" }
                 }
-                FilterChips()
+                FilterChips(includeExtensions: model.scopeFormats.count <= 1)
                 if !model.filter.isEmpty {
                     Button("Alle Filter entfernen") { model.filter = LibraryFilter() }
                         .buttonStyle(CapsuleButtonStyle(role: .plain, compact: true))

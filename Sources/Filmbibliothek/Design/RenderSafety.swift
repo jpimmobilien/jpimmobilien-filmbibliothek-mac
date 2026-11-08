@@ -8,10 +8,16 @@ import Metal
 enum RenderSafety {
     static let gpuName: String = MTLCreateSystemDefaultDevice()?.name ?? "keine Metal-Grafik"
 
+    /// Nur Intel-Code auf einer virtuellen Grafik (beobachteter Absturz) bzw. ganz ohne Metal. Apple-Silicon-VMs
+    /// (ebenfalls „Paravirtual“) zeichnen Schatten und Unschärfe fehlerfrei – dort bleibt das volle Glas aktiv.
     static let reducedEffects: Bool = {
         if ProcessInfo.processInfo.environment["FB_REDUCED_EFFECTS"] == "1" { return true }
         guard let device = MTLCreateSystemDefaultDevice() else { return true }
+        #if arch(x86_64)
         return device.name.localizedCaseInsensitiveContains("paravirtual")
+        #else
+        return false
+        #endif
     }()
 }
 

@@ -158,7 +158,8 @@ struct MainView: View {
             }
         }
         group.notify(queue: .main) {
-            MainActor.assumeIsolated { model.addLocations(urls) }
+            let collected = urls
+            Task { @MainActor in model.addLocations(collected) }
         }
         return !providers.isEmpty
     }
