@@ -357,3 +357,27 @@ final class FormattingTests: XCTestCase {
         XCTAssertEqual(Fmt.frameRate(23.976), "23,976 fps")
     }
 }
+
+final class ContainerSnifferTests: XCTestCase {
+    func testProgramStream() {
+        XCTAssertEqual(ContainerSniffer.sniff([0, 0, 1, 0xBA, 0x44]), .mpegProgramStream)
+        XCTAssertEqual(ContainerSniffer.sniff([0, 0, 1, 0xB3, 0x14]), .mpegProgramStream)
+    }
+
+    func testTransportStreams() {
+        var ts = [UInt8](repeating: 0, count: 188 * 6)
+        for i in 0..<6 { ts[i * 188] = 0x47 }
+        XCTAssertEqual(ContainerSniffer.sniff(ts), .mpegTransportStream)
+        var m2ts = [UInt8](repeating: 0, count: 192 * 6)
+        for i in 0..<6 { m2ts[4 + i * 192] = 0x47 }
+        XCTAssertEqual(ContainerSniffer.sniff(m2ts), .m2ts)
+    }
+
+    func testOtherDataIsNotRecognized() {
+        XCTAssertNil(ContainerSniffer.sniff(Array("Das ist kein Video.".utf8)))
+        XCTAssertNil(ContainerSniffer.sniff([]))
+        var almost = [UInt8](repeating: 0, count: 188 * 6)
+        for i in 0..<4 { almost[i * 188] = 0x47 }
+        XCTAssertNil(ContainerSniffer.sniff(almost), "4 Sync-Bytes reichen nicht")
+    }
+}

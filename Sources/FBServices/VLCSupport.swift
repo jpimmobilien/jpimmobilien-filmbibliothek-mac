@@ -71,91 +71,72 @@ public enum VLCSupport {
         return (info, hasVideo)
     }
 
-    // MARK: - Gründliche Prüfung durch kurzes, stummes Abspielen
+    // MARK: - Prüfung durch Dekodieren (MPEG-Programm-/Transportstrom)
 
-    /// Eigener libVLC-Player mit Attrappen-Ausgabe (kein Bild, kein Ton) – nur für die Prüfung.
-    @MainActor private static var probePlayer: VLCMediaPlayer?
-    @MainActor private static var probeBusy = false
-
-    /// Manche Container (z. B. MPEG-Programmstrom .mpg/.mpeg, Transportstrom .ts) verraten Spuren und Bildgröße erst
-    /// beim Dekodieren. Dann wird die Datei ohne Bild- und Tonausgabe (Attrappen-Module) kurz abgespielt.
-    /// Ergebnis: Angaben (nil = nicht abspielbar) und – wenn möglich – ein Einzelbild.
-    @MainActor
-    public static func deepProbe(url: URL, maxSeconds: Double = 5) async -> (VideoInfo?, CGImage?) {
-        while probeBusy { try? await Task.sleep(nanoseconds: 50_000_000) }
-        probeBusy = true
-        defer { probeBusy = false }
-        let player = probePlayer ?? VLCMediaPlayer(options: ["--aout=dummy", "--vout=dummy", "--no-osd", "--no-spu", "--no-video-title-show", "--no-stats"])
-        probePlayer = player
-        let media = VLCMedia(url: url)
-        player.media = media
-        player.play()
-        let start = Date()
-        var playing = false
-        while Date().timeIntervalSince(start) < maxSeconds {
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            let st = player.state.rawValue   // 0 gestoppt, 1 öffnet, 2 puffert, 3 Ende, 4 Fehler, 5 spielt, 6 pausiert
-            if st == 4 { break }
-            if st == 5 || player.isPlaying { playing = true }
-            if st == 3 { break }
-            if playing && player.time.intValue > 700 { break }
-            if !playing && st == 0 && Date().timeIntervalSince(start) > 2 { break }
-        }
-        var result: VideoInfo? = nil
-        var image: CGImage? = nil
-        if playing || player.time.intValue > 0 {
-            var (info, hasVideo) = readInfo(media)
-            let size = player.videoSize
-            if size.width > 0 && size.height > 0 {
-                info.width = Int(size.width)
-                info.height = Int(size.height)
-                hasVideo = true
-            }
-            if info.durationSeconds == nil, let ms = player.media?.length.intValue, ms > 0 { info.durationSeconds = Double(ms) / 1000 }
-            if hasVideo || info.audioTrackCount > 0 {
-                result = info
-                if hasVideo {
-                    let path = FileManager.default.temporaryDirectory.appendingPathComponent("fb-probe-\(UUID().uuidString).png").path
-                    player.saveVideoSnapshot(at: path, withWidth: 0, andHeight: 0)
-                    for _ in 0..<15 {
-                        try? await Task.sleep(nanoseconds: 100_000_000)
-                        if let img = NSImage(contentsOfFile: path), let cg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-                            image = cg
-                            break
-                        }
-                    }
-                    try? FileManager.default.removeItem(atPath: path)
-                }
-            }
-        }
-        player.stop()
-        player.media = nil
-        return (result, image)
-    }
-
-    /// Vollständige Prüfung: schnelle Vorprüfung, bei fehlenden Angaben gründliche Prüfung.
+    /// Vollständige Prüfung einer Datei, die AVFoundation nicht öffnet.
+    ///
+    /// 1. Schnelle Vorprüfung (libVLC liest den Container).
+    /// 2. Fehlen Bildgröße oder Spuren (typisch für MPEG-Programmstrom .mpg/.mpeg und Transportstrom .ts/.mts/.m2ts,
+    ///    deren Spuren erst beim Dekodieren bekannt werden), wird mit dem Vorschaubild-Dienst von VLCKit ein Bild
+    ///    dekodiert – über die gemeinsame libVLC, ohne Fenster und ohne Ton. Danach kennt libVLC die Spuren.
+    /// Ergebnis: Angaben (nil = nicht abspielbar) und – falls dekodiert – ein Vorschaubild.
     public static func analyze(url: URL) async -> (VideoInfo?, CGImage?) {
         let quick = await probe(url: url)
         if let q = quick, q.width != nil, q.height != nil { return (q, nil) }
-        let (deep, image) = await deepProbe(url: url)
-        guard var merged = deep else { return (quick, nil) }
-        if let q = quick {
-            merged.videoCodec = merged.videoCodec ?? q.videoCodec
-            merged.audioCodec = merged.audioCodec ?? q.audioCodec
-            merged.audioTrackCount = max(merged.audioTrackCount, q.audioTrackCount)
-            merged.subtitleTrackCount = max(merged.subtitleTrackCount, q.subtitleTrackCount)
-            merged.durationSeconds = q.durationSeconds ?? merged.durationSeconds
-            merged.frameRate = merged.frameRate ?? q.frameRate
-            merged.embeddedTitle = merged.embeddedTitle ?? q.embeddedTitle
+        let container = ContainerSniffer.sniff(url: url)
+        // Weder libVLC noch die Dateisignatur erkennen ein Video → nicht abspielbar
+        guard quick != nil || container != nil else { return (nil, nil) }
+        let decoded = await decode(url: url)
+        var info = quick ?? VideoInfo()
+        if let d = decoded.info {
+            info.width = info.width ?? d.width
+            info.height = info.height ?? d.height
+            info.frameRate = info.frameRate ?? d.frameRate
+            info.videoCodec = info.videoCodec ?? d.videoCodec
+            info.audioCodec = info.audioCodec ?? d.audioCodec
+            info.audioTrackCount = max(info.audioTrackCount, d.audioTrackCount)
+            info.subtitleTrackCount = max(info.subtitleTrackCount, d.subtitleTrackCount)
+            info.durationSeconds = info.durationSeconds ?? d.durationSeconds
         }
-        return (merged, image)
+        var image = decoded.image
+        if let img = image, let w = info.width, let h = info.height, w > 0, h > 0 {
+            image = rescale(img, toAspect: CGFloat(w) / CGFloat(h))
+        }
+        // Signatur erkannt, aber nichts dekodierbar und keine Vorprüfung → nicht als abspielbar ausgeben
+        if quick == nil && decoded.info == nil && image == nil { return (nil, nil) }
+        return (info, image)
+    }
+
+    /// Dekodiert ein Vorschaubild (erst bei 12 %, sonst am Anfang) und liest danach die Spuren aus.
+    @MainActor
+    static func decode(url: URL) async -> (image: CGImage?, info: VideoInfo?) {
+        for position: Float in [0.12, 0.0] {
+            let media = VLCMedia(url: url)
+            let image = await ThumbnailJob().run(media: media, position: position, width: 640, height: 360)
+            let (info, hasVideo) = readInfo(media)
+            if image != nil || hasVideo { return (image, hasVideo ? info : nil) }
+        }
+        return (nil, nil)
+    }
+
+    /// Bringt ein Vorschaubild auf das echte Seitenverhältnis (VLCKit liefert die angefragte Größe).
+    static func rescale(_ image: CGImage, toAspect aspect: CGFloat) -> CGImage {
+        let current = CGFloat(image.width) / CGFloat(max(1, image.height))
+        guard aspect.isFinite, aspect > 0, abs(current - aspect) / aspect > 0.03 else { return image }
+        let height = image.height
+        let width = max(1, Int((CGFloat(height) * aspect).rounded()))
+        guard let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB(),
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return image }
+        ctx.interpolationQuality = .high
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        return ctx.makeImage() ?? image
     }
 
     /// Vorschaubild mit libVLC (läuft auf dem Haupt-Thread, weil VLCMediaThumbnailer Zeitgeber nutzt).
     @MainActor
     public static func thumbnail(url: URL, position: Float = 0.12, width: CGFloat = 640, height: CGFloat = 360) async -> CGImage? {
-        let job = ThumbnailJob()
-        return await job.run(url: url, position: position, width: width, height: height)
+        await ThumbnailJob().run(media: VLCMedia(url: url), position: position, width: width, height: height)
     }
 
     @MainActor
@@ -164,10 +145,9 @@ public enum VLCSupport {
         private var thumbnailer: VLCMediaThumbnailer?
         private var timer: Timer?
 
-        func run(url: URL, position: Float, width: CGFloat, height: CGFloat) async -> CGImage? {
+        func run(media: VLCMedia, position: Float, width: CGFloat, height: CGFloat) async -> CGImage? {
             await withCheckedContinuation { (cont: CheckedContinuation<CGImage?, Never>) in
                 continuation = cont
-                let media = VLCMedia(url: url)
                 let t = VLCMediaThumbnailer(media: media, andDelegate: self)
                 t.thumbnailWidth = width
                 t.thumbnailHeight = height

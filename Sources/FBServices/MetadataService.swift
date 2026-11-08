@@ -72,15 +72,7 @@ public enum AVProbe {
                 }
             }
 
-            var chapters: [ChapterMark] = []
-            let groups = (try? await asset.loadChapterMetadataGroups(bestMatchingPreferredLanguages: ["de", "en"])) ?? []
-            for (i, g) in groups.enumerated() {
-                let start = CMTimeGetSeconds(g.timeRange.start)
-                var title = "Kapitel \(i + 1)"
-                if let item = g.items.first(where: { $0.commonKey == .commonKeyTitle }),
-                   let t = try? await item.load(.stringValue), !t.isEmpty { title = t }
-                if start.isFinite { chapters.append(ChapterMark(title: title, start: max(0, start))) }
-            }
+            let chapters = await chapterMarks(asset)
             info.chapterCount = chapters.count
 
             let playable = isPlayable && allVideoPlayable && (!videoTracks.isEmpty || !audioTracks.isEmpty)
@@ -88,6 +80,28 @@ public enum AVProbe {
         } catch {
             return nil
         }
+    }
+
+    /// Kapitel einer Datei: bevorzugt Deutsch/Englisch, sonst in der Sprache, in der die Datei sie führt
+    /// (häufig „und“ = unbestimmt, z. B. bei mit ffmpeg oder HandBrake erzeugten Dateien).
+    public static func chapterMarks(_ asset: AVAsset) async -> [ChapterMark] {
+        let locales = (try? await asset.load(.availableChapterLocales)) ?? []
+        var groups = (try? await asset.loadChapterMetadataGroups(bestMatchingPreferredLanguages: ["de", "en"] + locales.map(\.identifier))) ?? []
+        if groups.isEmpty {
+            for locale in locales + [Locale(identifier: "und"), Locale.current] {
+                groups = (try? await asset.loadChapterMetadataGroups(withTitleLocale: locale, containingItemsWithCommonKeys: [])) ?? []
+                if !groups.isEmpty { break }
+            }
+        }
+        var marks: [ChapterMark] = []
+        for (i, g) in groups.enumerated() {
+            let start = CMTimeGetSeconds(g.timeRange.start)
+            var title = "Kapitel \(i + 1)"
+            if let item = g.items.first(where: { $0.commonKey == .commonKeyTitle }),
+               let t = try? await item.load(.stringValue), !t.isEmpty { title = t }
+            if start.isFinite { marks.append(ChapterMark(title: title, start: max(0, start))) }
+        }
+        return marks
     }
 
     /// Einzelbild aus dem Video (AVAssetImageGenerator). Vermeidet sehr dunkle Bilder (Abblenden, Vorspann).
@@ -225,6 +239,10 @@ public final class MetadataService: @unchecked Sendable {
                 return (.videoFrame, stamp)
             }
         case .vlc:
+            // Bereits bei der Prüfung dekodiertes Bild (MPEG-Programm-/Transportstrom) – kein zweiter Durchgang
+            if let img = vlcFrame, let stamp = try? covers.save(img, filmId: film.id) {
+                return (.videoFrame, stamp)
+            }
             var w: CGFloat = 640, h: CGFloat = 360
             if let iw = info.width, let ih = info.height, iw > 0, ih > 0 {
                 h = (w * CGFloat(ih) / CGFloat(iw)).rounded()
@@ -233,10 +251,6 @@ public final class MetadataService: @unchecked Sendable {
             let width = w, height = h
             if let img = await VLCSupport.thumbnail(url: fileURL, position: 0.12, width: width, height: height),
                let stamp = try? covers.save(img, filmId: film.id) {
-                return (.videoFrame, stamp)
-            }
-            // Ersatz: Einzelbild aus der gründlichen Prüfung (z. B. Transportströme)
-            if let img = vlcFrame, let stamp = try? covers.save(img, filmId: film.id) {
                 return (.videoFrame, stamp)
             }
         default:

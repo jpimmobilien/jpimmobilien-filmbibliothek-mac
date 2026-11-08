@@ -18,10 +18,12 @@ Dokumentation: [docs/](docs/) – Installation, Funktionen, Architektur, Testber
 
 ```
 scripts/fetch_vlckit.sh     # VLCKit 3.7.3 (offizielle Binärdatei, Prüfsumme festgelegt) nach Vendor/
-swift test                  # alle Tests (macOS: echte Disk-Images und Wiedergabe)
+scripts/run_tests.sh        # alle Tests (macOS: echte Disk-Images und Wiedergabe; kopiert VLCKit ins Testbündel)
 scripts/build_app.sh        # build/Filmbibliothek.app (arm64 + x86_64, App-Sandbox, ad-hoc signiert)
 scripts/make_dmg.sh         # dist/Filmbibliothek_macOS_Universal.dmg
 ```
 
-In Xcode: `Package.swift` öffnen (Schema „Filmbibliothek“). GitHub Actions (`.github/workflows/build.yml`)
+In Xcode: `Package.swift` öffnen (Schema „Filmbibliothek“) oder mit [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+ein klassisches Projekt erzeugen: `xcodegen generate` → `Filmbibliothek.xcodeproj` (App-Ziel mit Sandbox-Berechtigungen,
+Bibliotheken aus dem Swift-Paket). GitHub Actions (`.github/workflows/build.yml`)
 baut, testet und erstellt die DMG bei jedem Push; Ergebnisse liegen im Zweig `ci-ergebnisse`.

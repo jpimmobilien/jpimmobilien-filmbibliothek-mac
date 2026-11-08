@@ -188,15 +188,7 @@ public final class AVPlaybackEngine: NSObject, PlaybackEngine {
             let r = CGRect(origin: .zero, size: geometry.0).applying(geometry.1)
             videoSize = CGSize(width: abs(r.width), height: abs(r.height))
         }
-        let groups = (try? await asset.loadChapterMetadataGroups(bestMatchingPreferredLanguages: ["de", "en"])) ?? []
-        var marks: [ChapterMark] = []
-        for (i, g) in groups.enumerated() {
-            let s = CMTimeGetSeconds(g.timeRange.start)
-            var title = "Kapitel \(i + 1)"
-            if let it = g.items.first(where: { $0.commonKey == .commonKeyTitle }), let t = try? await it.load(.stringValue), !t.isEmpty { title = t }
-            if s.isFinite { marks.append(ChapterMark(title: title, start: max(0, s))) }
-        }
-        chapters = marks
+        chapters = await AVProbe.chapterMarks(asset)
         onChange?()
     }
 

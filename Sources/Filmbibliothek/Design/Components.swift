@@ -406,13 +406,19 @@ struct MasonryLayout: Layout {
     var spacing: CGFloat = 16
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? (minColumnWidth * 2 + spacing)
+        // Vorschläge können fehlen (nil), 0 oder unendlich sein (ideale Größe in Stapeln/Scrollbereichen)
+        let width = Self.usableWidth(proposal.width, fallback: minColumnWidth * 2 + spacing)
         let (_, height) = arrange(width: width, subviews: subviews)
         return CGSize(width: width, height: height)
     }
 
+    static func usableWidth(_ proposed: CGFloat?, fallback: CGFloat) -> CGFloat {
+        guard let w = proposed, w.isFinite, w > 1 else { return fallback }
+        return w
+    }
+
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let (frames, _) = arrange(width: bounds.width, subviews: subviews)
+        let (frames, _) = arrange(width: Self.usableWidth(bounds.width, fallback: minColumnWidth), subviews: subviews)
         for (index, frame) in frames.enumerated() {
             subviews[index].place(at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
                                   anchor: .topLeading,
@@ -421,13 +427,15 @@ struct MasonryLayout: Layout {
     }
 
     private func arrange(width: CGFloat, subviews: Subviews) -> ([CGRect], CGFloat) {
-        let usable = max(1, width)
-        let count = max(1, Int((usable + spacing) / (minColumnWidth + spacing)))
+        let usable = Self.usableWidth(width, fallback: minColumnWidth)
+        let ratio = (usable + spacing) / max(1, minColumnWidth + spacing)
+        let count = max(1, min(12, ratio.isFinite ? Int(ratio) : 1))
         let columnWidth = (usable - CGFloat(count - 1) * spacing) / CGFloat(count)
         var heights = Array(repeating: CGFloat(0), count: count)
         var frames: [CGRect] = []
         for subview in subviews {
-            let height = subview.sizeThatFits(ProposedViewSize(width: columnWidth, height: nil)).height
+            let measured = subview.sizeThatFits(ProposedViewSize(width: columnWidth, height: nil)).height
+            let height = measured.isFinite ? max(0, measured) : 0
             var column = 0
             for i in 1..<count where heights[i] < heights[column] - 0.5 { column = i }
             let y = heights[column] == 0 ? 0 : heights[column] + spacing

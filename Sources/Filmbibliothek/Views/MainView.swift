@@ -203,6 +203,7 @@ struct StartupErrorSheet: View {
         }
         .padding(26)
         .frame(width: 480)
+        .background(AmbientBackground())
     }
 }
 
@@ -238,6 +239,7 @@ struct CollectionNameSheet: View {
         }
         .padding(26)
         .frame(width: 420)
+        .background(AmbientBackground())
         .onAppear { name = prompt.renaming?.name ?? "" }
     }
 
