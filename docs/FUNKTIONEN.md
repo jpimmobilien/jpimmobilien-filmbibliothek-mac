@@ -36,6 +36,7 @@ Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
 - Große Poster, kompakte Poster, Liste mit sortierbaren Spalten; Kacheln 16:9 oder 2:3.
 - Bereiche: Alle Filme, Weiterschauen (nicht beendet), Zuletzt hinzugefügt, Zuletzt abgespielt, Favoriten, Nicht verfügbar, Sammlungen, Speicherorte, Ordner.
 - Suche über Titel, Dateiname, Endung, Ordner, Speicherort und technische Angaben; mehrere Wörter = UND, „-wort“ schließt aus, "…" für zusammenhängenden Text.
+- Format-Chips mit Anzahl über der Liste („Alle 22 · MP4 7 · MKV 3 …“) – ein Klick filtert nach dem Format.
 - Filter: Speicherort, Format, Auflösung, Größe, Laufzeit, Favoriten, Wiedergabestatus, Verfügbarkeit – kombinierbar, als Chips entfernbar.
 - Sortierung: Titel, Dateiname, Hinzugefügt, Geändert, Größe, Laufzeit, Auflösung, Zuletzt abgespielt, Format.
 

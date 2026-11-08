@@ -14,6 +14,9 @@
 - Alle übrigen Formate (MKV, AVI, WMV, MPG, MPEG, TS, MTS, M2TS, WEBM, FLV) spielt VLCKit. Geprüft mit je einer
   selbst erzeugten Testdatei pro Format (Codecs: siehe Testbericht). Exotische Codecs oder DRM-geschützte Dateien
   können trotzdem scheitern – die App zeigt dann „Nicht abspielbar“ bzw. eine Meldung im Player.
+- MPEG-Programmströme (.mpg/.mpeg) und Transportströme (.ts/.mts/.m2ts) werden an ihrer Dateisignatur erkannt und
+  durch Dekodieren eines Bildes geprüft. Bei Transportströmen liefert VLCKit dabei im Test zwar Bildgröße und Codecs,
+  aber kein Vorschaubild – das Titelbild entsteht dort beim ersten Abspielen („zuletzt gesehenes Bild“).
 - Kapitel von MKV-Dateien zeigt VLCKit erst während der Wiedergabe (die Detailseite nennt dort „beim Abspielen“).
 - Eingebettete Cover in MKV-Anhängen werden nicht gelesen (stattdessen Bild aus dem Video).
 - HDR-Videos werden je nach Engine und Bildschirm ggf. als SDR dargestellt.
@@ -27,6 +30,12 @@
   Durchsuchen (beim Start, beim Anschließen eines Laufwerks oder mit ⌘R).
 - Netzlaufwerke werden nicht selbst verbunden; „Verbinden“ übergibt die Adresse an den Finder (Zugangsdaten aus dem
   Schlüsselbund).
+
+## Laufwerke
+- FAT32 auf Intel-Macs (in der CI beobachtet): Nach erneutem Einbinden meldet macOS eine andere Volume-UUID. Der Ort
+  wird trotzdem über das gespeicherte Lesezeichen wiedererkannt; die App aktualisiert die gespeicherte Kennung.
+- Beim Auswerfen über den Finder beendet die App die Wiedergabe sofort (Position gesichert). Wird ein Datenträger
+  ohne Auswerfen abgezogen, kann AVFoundation bei kleinen Dateien noch kurz aus dem Zwischenspeicher weiterspielen.
 
 ## Darstellung
 - Echtes Liquid Glass gibt es nur auf macOS 26 (Tahoe) und nur, wenn die App mit dem macOS-26-SDK gebaut wurde (so
