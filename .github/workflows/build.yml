@@ -1,0 +1,329 @@
+# Filmbibliothek für macOS – Tests, Universal-Build, Sandbox-Prüfung, Vorschaubilder, DMG
+#
+#   build   macOS 26 (Apple Silicon, Xcode 26 → echtes Liquid Glass): VLCKit laden, alle Swift-Tests
+#           (inkl. echter Disk-Images und Wiedergabe), Universal-App (arm64 + x86_64), Sandbox-Ablauf mit der
+#           echten App, Vorschaubilder (Liquid Glass und Rückfall), DMG
+#   smoke   macOS 15 (Apple Silicon): DMG einhängen, App installieren, Sandbox-Ablauf nativ und als Intel-Code
+#           über Rosetta, Vorschaubilder (macOS 15 = Glas-Nachbildung)
+#   intel   macOS 15 auf Intel: alle Swift-Tests nativ in x86_64, Sandbox-Ablauf mit der DMG-App
+#   results Ergebnisse in den Zweig „ci-ergebnisse“ (DMG in Teilen, Bilder, Protokolle) + Vorab-Release
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  APP_VERSION: "1.0.0"
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+
+jobs:
+  build:
+    name: Tests, Universal-Build, DMG (macOS 26)
+    runs-on: macos-26
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge
+        run: |
+          MAJOR=$(xcodebuild -version | head -1 | sed -E 's/Xcode ([0-9]+).*/\1/')
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -vi beta | sort -V | tail -1)
+          if [ "${MAJOR:-0}" -lt 26 ] && [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          sw_vers; uname -m; xcodebuild -version; swift --version
+          mkdir -p logs
+      - name: VLCKit laden (offizielle Binärdatei, Prüfsumme festgelegt)
+        run: scripts/fetch_vlckit.sh 2>&1 | tee logs/vlckit.txt
+      - name: Developer-ID-Zertifikat laden (nur wenn als Secret hinterlegt)
+        env:
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: scripts/notarize.sh keychain
+      - name: App bauen (arm64 + x86_64)
+        env:
+          VERSION: ${{ env.APP_VERSION }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -o pipefail
+          scripts/build_app.sh 2>&1 | tee logs/build-output.txt
+      - name: Swift-Tests (Apple Silicon)
+        id: tests
+        continue-on-error: true
+        env:
+          FB_REQUIRE_VLC: "1"
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tee logs/test-output.txt
+      - name: Sandbox-Ablauf mit der echten App
+        id: sandbox
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          scripts/qa_sandbox.sh build/Filmbibliothek.app qa/macos26-sandbox 2>&1 | tee logs/sandbox-macos26.txt
+      - name: Vorschaubilder (Liquid Glass)
+        id: snap_glass
+        continue-on-error: true
+        run: scripts/run_snapshots.sh build/QA/Filmbibliothek.app snapshots/macos26-liquid-glass
+      - name: Vorschaubilder (Rückfall ohne Liquid Glass)
+        id: snap_fallback
+        continue-on-error: true
+        env:
+          FB_FORCE_GLASS_FALLBACK: "1"
+        run: scripts/run_snapshots.sh build/QA/Filmbibliothek.app snapshots/macos26-fallback
+      - name: DMG erstellen und prüfen
+        run: |
+          set -o pipefail
+          scripts/make_dmg.sh 2>&1 | tee logs/dmg-output.txt
+      - name: DMG beglaubigen (nur mit Developer-ID-Zugangsdaten)
+        env:
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: |
+          set -o pipefail
+          scripts/notarize.sh dmg 2>&1 | tee logs/notarize-output.txt
+      - name: Prüfbericht des Pakets
+        if: always()
+        run: |
+          {
+            echo "== lipo =="; lipo -info build/Filmbibliothek.app/Contents/MacOS/Filmbibliothek
+            [ -e build/Filmbibliothek.app/Contents/Frameworks/VLCKit.framework/VLCKit ] && lipo -info build/Filmbibliothek.app/Contents/Frameworks/VLCKit.framework/VLCKit
+            echo "== codesign =="; codesign -dvv build/Filmbibliothek.app 2>&1
+            echo "== entitlements =="; codesign -d --entitlements - build/Filmbibliothek.app 2>&1
+            echo "== spctl =="; spctl --assess --type execute -vv build/Filmbibliothek.app 2>&1 || true
+            echo "== Größe =="; du -sh build/Filmbibliothek.app dist/*.dmg 2>/dev/null
+            echo "== Info.plist =="; plutil -p build/Filmbibliothek.app/Contents/Info.plist
+          } > logs/paket-pruefung.txt 2>&1 || true
+          cat logs/paket-pruefung.txt
+      - name: QA-App packen (für die Vorschaubilder auf macOS 15)
+        run: ditto -c -k --keepParent build/QA/Filmbibliothek.app dist/QA-Filmbibliothek.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Filmbibliothek-dmg
+          path: |
+            dist/Filmbibliothek_macOS_Universal.dmg
+            dist/Filmbibliothek_macOS_Universal.dmg.sha256
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa-app
+          path: dist/QA-Filmbibliothek.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos26
+          path: |
+            logs/
+            qa/
+            snapshots/
+          if-no-files-found: ignore
+      - name: Fehlgeschlagene Prüfungen melden
+        if: steps.tests.outcome == 'failure' || steps.sandbox.outcome == 'failure' || steps.snap_glass.outcome == 'failure' || steps.snap_fallback.outcome == 'failure'
+        run: |
+          echo "Tests: ${{ steps.tests.outcome }}, Sandbox: ${{ steps.sandbox.outcome }}, Bilder: ${{ steps.snap_glass.outcome }}/${{ steps.snap_fallback.outcome }}"
+          exit 1
+
+  smoke:
+    name: Start auf macOS 15 (${{ matrix.label }})
+    needs: build
+    if: ${{ !cancelled() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Apple Silicon nativ
+            arch: ""
+            name: macos15-arm64
+          - label: Intel-Code über Rosetta
+            arch: x86_64
+            name: macos15-rosetta-x86_64
+    runs-on: macos-15
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Filmbibliothek-dmg
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: qa-app
+          path: dist
+      - name: Rosetta bereitstellen
+        if: matrix.arch == 'x86_64'
+        run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license || true
+      - name: DMG einhängen und App installieren
+        run: |
+          sw_vers; uname -m
+          mkdir -p logs
+          (cd dist && shasum -a 256 -c Filmbibliothek_macOS_Universal.dmg.sha256)
+          MNT="$(mktemp -d)"
+          hdiutil attach dist/Filmbibliothek_macOS_Universal.dmg -nobrowse -readonly -mountpoint "$MNT"
+          ls -la "$MNT"
+          mkdir -p "$HOME/Applications"
+          ditto "$MNT/Filmbibliothek.app" "$HOME/Applications/Filmbibliothek.app"
+          hdiutil detach "$MNT"
+          lipo -archs "$HOME/Applications/Filmbibliothek.app/Contents/MacOS/Filmbibliothek" | tee logs/lipo.txt
+          codesign --verify --deep --strict --verbose=2 "$HOME/Applications/Filmbibliothek.app"
+          (cd dist && ditto -x -k QA-Filmbibliothek.zip qa-app)
+      - name: Sandbox-Ablauf mit der installierten App
+        id: sandbox
+        continue-on-error: true
+        env:
+          QA_ARCH: ${{ matrix.arch }}
+        run: |
+          set -o pipefail
+          scripts/qa_sandbox.sh "$HOME/Applications/Filmbibliothek.app" "qa/${{ matrix.name }}-sandbox" 2>&1 | tee "logs/sandbox-${{ matrix.name }}.txt"
+      - name: Vorschaubilder (macOS 15, Glas-Nachbildung)
+        id: snap
+        continue-on-error: true
+        env:
+          SNAPSHOT_ARCH: ${{ matrix.arch }}
+        run: scripts/run_snapshots.sh dist/qa-app/Filmbibliothek.app "snapshots/${{ matrix.name }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.name }}
+          path: |
+            logs/
+            qa/
+            snapshots/
+          if-no-files-found: ignore
+      - name: Ergebnis
+        if: steps.sandbox.outcome == 'failure' || steps.snap.outcome == 'failure'
+        run: |
+          echo "Sandbox: ${{ steps.sandbox.outcome }}, Bilder: ${{ steps.snap.outcome }}"
+          exit 1
+
+  intel:
+    name: Intel · macOS 15 (Tests + App)
+    needs: build
+    if: ${{ !cancelled() }}
+    runs-on: macos-15-intel
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Filmbibliothek-dmg
+          path: dist
+      - name: Werkzeuge
+        run: |
+          sw_vers; uname -m; xcodebuild -version; swift --version
+          mkdir -p logs
+          scripts/fetch_vlckit.sh
+      - name: Swift-Tests (x86_64 nativ)
+        id: tests
+        continue-on-error: true
+        env:
+          FB_REQUIRE_VLC: "1"
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tee logs/test-output-intel.txt
+      - name: App aus der DMG installieren
+        run: |
+          MNT="$(mktemp -d)"
+          hdiutil attach dist/Filmbibliothek_macOS_Universal.dmg -nobrowse -readonly -mountpoint "$MNT"
+          mkdir -p "$HOME/Applications"
+          ditto "$MNT/Filmbibliothek.app" "$HOME/Applications/Filmbibliothek.app"
+          hdiutil detach "$MNT"
+      - name: Sandbox-Ablauf auf Intel
+        id: sandbox
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          scripts/qa_sandbox.sh "$HOME/Applications/Filmbibliothek.app" qa/macos15-intel-sandbox 2>&1 | tee logs/sandbox-intel.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: intel-macos15
+          path: |
+            logs/
+            qa/
+          if-no-files-found: ignore
+      - name: Ergebnis
+        if: steps.tests.outcome == 'failure' || steps.sandbox.outcome == 'failure'
+        run: |
+          echo "Tests: ${{ steps.tests.outcome }}, Sandbox: ${{ steps.sandbox.outcome }}"
+          exit 1
+
+  results:
+    name: Ergebnisse sichern
+    if: always()
+    needs: [build, smoke, intel]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ergebnisse
+      - name: Bilder verkleinern, DMG teilen
+        run: |
+          rm -rf ergebnisse/qa-app
+          python3 -m pip install --quiet --user --break-system-packages pillow
+          python3 - <<'PY'
+          import pathlib
+          from PIL import Image
+          for p in pathlib.Path("ergebnisse").rglob("*.png"):
+              im = Image.open(p).convert("RGB")
+              if im.width > 2000:
+                  im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
+              im.save(p.with_suffix(".jpg"), quality=86, optimize=True)
+              p.unlink()
+          PY
+          D=ergebnisse/Filmbibliothek-dmg
+          if [ -f "$D/Filmbibliothek_macOS_Universal.dmg" ]; then
+            (cd "$D" && split -b 45m -d Filmbibliothek_macOS_Universal.dmg Filmbibliothek_macOS_Universal.dmg.teil- && rm Filmbibliothek_macOS_Universal.dmg && ls -la)
+          fi
+      - name: In Zweig „ci-ergebnisse“ schreiben
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd ergebnisse
+          {
+            echo "Lauf: ${GITHUB_RUN_NUMBER} (${GITHUB_SHA})"
+            echo "build: ${{ needs.build.result }}"
+            echo "smoke: ${{ needs.smoke.result }}"
+            echo "intel: ${{ needs.intel.result }}"
+            date -u
+          } > ERGEBNIS.txt
+          git init -q -b ci-ergebnisse
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "CI-Ergebnisse Lauf ${GITHUB_RUN_NUMBER}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-ergebnisse
+
+  release:
+    name: GitHub-Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, smoke, intel]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Filmbibliothek-dmg
+          path: dist
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/Filmbibliothek_macOS_Universal.dmg dist/Filmbibliothek_macOS_Universal.dmg.sha256 \
+            --repo "${GITHUB_REPOSITORY}" --title "Filmbibliothek ${GITHUB_REF_NAME}" \
+            --notes "Universal (Apple Silicon + Intel), macOS 13 Ventura oder neuer. Ohne Developer-ID ad-hoc signiert – siehe „Installation – bitte lesen.txt“."

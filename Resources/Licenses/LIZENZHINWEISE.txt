@@ -1,0 +1,18 @@
+Filmbibliothek für macOS – Lizenzhinweise
+=========================================
+
+Fremdbestandteile in der App:
+
+VLCKit 3.7.3 (mit libVLC 3) – VideoLAN
+  Lizenz: GNU Lesser General Public License, Version 2.1 oder neuer (LGPL-2.1+)
+  Einbindung: unverändertes, dynamisch geladenes Framework (Contents/Frameworks/VLCKit.framework),
+  bezogen als offizielle Binärdatei von download.videolan.org (Prüfsumme siehe scripts/fetch_vlckit.sh).
+  Quelltext: https://code.videolan.org/videolan/VLCKit (Tag 3.7.3) und https://code.videolan.org/videolan/vlc
+  Der vollständige Lizenztext liegt bei (VLCKit-LGPL-2.1.txt). Sie dürfen das Framework gemäß LGPL
+  durch eine eigene, kompatible Fassung ersetzen.
+
+Systembestandteile von macOS (nicht mitgeliefert): SwiftUI, AppKit, AVFoundation, AVKit, CoreMedia,
+ImageIO, SQLite (libsqlite3), IOKit.
+
+Die Testvideos im Quellcode (Tests/Fixtures) sind selbst erzeugte Testbilder (ffmpeg-Generatoren
+testsrc2, smptehdbars, mandelbrot) und enthalten keine fremden Inhalte.
