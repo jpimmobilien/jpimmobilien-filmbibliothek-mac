@@ -262,7 +262,17 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          scripts/qa_sandbox.sh "$HOME/Applications/Filmbibliothek.app" qa/macos15-intel-sandbox 2>&1 | tee logs/sandbox-intel.txt
+          GPU="$(system_profiler SPDisplaysDataType 2>/dev/null | awk -F': ' '/Chipset Model/{print $2; exit}')"
+          echo "Grafik der Maschine: ${GPU:-unbekannt}" | tee logs/intel-grafik.txt
+          if echo "$GPU" | grep -qi paravirtual; then
+            # Bekannte Grenze der GitHub-Intel-VMs: Die SwiftUI-Darstellung bricht in Apples Metal-Bibliothek ab
+            # (MTLLoader sliceIDForDevice). Echte Intel-Macs haben eine Grafikkarte. Der x86_64-Code der App wird
+            # stattdessen unter Rosetta auf Apple Silicon geprüft (Job „smoke“). Hier nur informativ:
+            echo "▸ Virtuelle Grafik ohne vollwertiges Metal – Ablauf nur informativ" | tee -a logs/intel-grafik.txt
+            scripts/qa_sandbox.sh "$HOME/Applications/Filmbibliothek.app" qa/macos15-intel-sandbox 2>&1 | tee logs/sandbox-intel.txt || true
+          else
+            scripts/qa_sandbox.sh "$HOME/Applications/Filmbibliothek.app" qa/macos15-intel-sandbox 2>&1 | tee logs/sandbox-intel.txt
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

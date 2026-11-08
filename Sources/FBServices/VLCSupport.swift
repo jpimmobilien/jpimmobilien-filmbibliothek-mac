@@ -80,12 +80,13 @@ public enum VLCSupport {
     ///    deren Spuren erst beim Dekodieren bekannt werden), wird mit dem Vorschaubild-Dienst von VLCKit ein Bild
     ///    dekodiert – über die gemeinsame libVLC, ohne Fenster und ohne Ton. Danach kennt libVLC die Spuren.
     /// Ergebnis: Angaben (nil = nicht abspielbar) und – falls dekodiert – ein Vorschaubild.
-    public static func analyze(url: URL) async -> (VideoInfo?, CGImage?) {
+    /// Drittes Ergebnis: Es wurde bereits versucht, ein Bild zu dekodieren (dann kein zweiter Versuch für das Titelbild).
+    public static func analyze(url: URL) async -> (VideoInfo?, CGImage?, Bool) {
         let quick = await probe(url: url)
-        if let q = quick, q.width != nil, q.height != nil { return (q, nil) }
+        if let q = quick, q.width != nil, q.height != nil { return (q, nil, false) }
         let container = ContainerSniffer.sniff(url: url)
         // Weder libVLC noch die Dateisignatur erkennen ein Video → nicht abspielbar
-        guard quick != nil || container != nil else { return (nil, nil) }
+        guard quick != nil || container != nil else { return (nil, nil, false) }
         let decoded = await decode(url: url)
         var info = quick ?? VideoInfo()
         if let d = decoded.info {
@@ -103,20 +104,22 @@ public enum VLCSupport {
             image = rescale(img, toAspect: CGFloat(w) / CGFloat(h))
         }
         // Signatur erkannt, aber nichts dekodierbar und keine Vorprüfung → nicht als abspielbar ausgeben
-        if quick == nil && decoded.info == nil && image == nil { return (nil, nil) }
-        return (info, image)
+        if quick == nil && decoded.info == nil && image == nil { return (nil, nil, true) }
+        return (info, image, true)
     }
 
     /// Dekodiert ein Vorschaubild (erst bei 12 %, sonst am Anfang) und liest danach die Spuren aus.
     @MainActor
     static func decode(url: URL) async -> (image: CGImage?, info: VideoInfo?) {
+        var known: VideoInfo? = nil
         for position: Float in [0.12, 0.0] {
             let media = VLCMedia(url: url)
             let image = await ThumbnailJob().run(media: media, position: position, width: 640, height: 360)
             let (info, hasVideo) = readInfo(media)
-            if image != nil || hasVideo { return (image, hasVideo ? info : nil) }
+            if hasVideo && known == nil { known = info }
+            if image != nil { return (image, hasVideo ? info : known) }
         }
-        return (nil, nil)
+        return (nil, known)
     }
 
     /// Bringt ein Vorschaubild auf das echte Seitenverhältnis (VLCKit liefert die angefragte Größe).
@@ -188,7 +191,7 @@ public enum VLCSupport {
     public static let isAvailable = false
     public static var versionString: String { "nicht enthalten" }
     public static func probe(url: URL, timeout: TimeInterval = 10) async -> VideoInfo? { nil }
-    public static func analyze(url: URL) async -> (VideoInfo?, CGImage?) { (nil, nil) }
+    public static func analyze(url: URL) async -> (VideoInfo?, CGImage?, Bool) { (nil, nil, false) }
     @MainActor public static func thumbnail(url: URL, position: Float = 0.12, width: CGFloat = 640, height: CGFloat = 360) async -> CGImage? { nil }
 }
 

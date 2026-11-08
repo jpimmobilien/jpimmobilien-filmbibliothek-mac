@@ -191,6 +191,28 @@ final class AppModel: ObservableObject {
         scheduleRecompute(debounce: 0.25)
     }
 
+    /// Mehrere Filme auf einmal neu laden – EINE Änderung der veröffentlichten Liste statt vieler
+    /// (wichtig bei Tausenden Filmen: jede Änderung zeichnet die Oberfläche neu).
+    func refreshFilms(_ ids: [Int64]) {
+        guard !ids.isEmpty else { return }
+        var list = films
+        var changed = false
+        for id in ids {
+            guard let f = try? store.film(id: id) else { continue }
+            if let i = filmIndex[id] {
+                list[i] = f
+            } else {
+                list.append(f)
+                filmIndex[id] = list.count - 1
+            }
+            changed = true
+        }
+        if changed {
+            films = list
+            scheduleRecompute(debounce: 0.25)
+        }
+    }
+
     func film(_ id: Int64) -> Film? { filmIndex[id].map { films[$0] } }
 
     func location(_ id: Int64) -> StorageLocation? { locations.first { $0.id == id } }
@@ -313,6 +335,20 @@ final class AppModel: ObservableObject {
             try? store.setLocationSeen(id: loc.id, path: url.path)
             let info = await Task.detached { VolumeInspector.volume(for: url) }.value
             volumeInfo[loc.id] = info
+            // Selbstheilung: Manche Laufwerke (beobachtet: FAT32 auf Intel-Macs) melden nach erneutem Einbinden eine
+            // andere Volume-UUID. Das Lesezeichen hat den Ort trotzdem gefunden → gespeicherte Kennung nachziehen,
+            // damit Auswerfen/Einbinden weiter richtig zugeordnet werden.
+            if let info, info.key != loc.volumeKey,
+               (try? store.location(volumeKey: info.key, pathInVolume: loc.pathInVolume)) == nil,
+               let i = locations.firstIndex(where: { $0.id == loc.id }) {
+                var updated = locations[i]
+                updated.volumeKey = info.key
+                updated.volumeName = info.name
+                if (try? store.updateLocation(updated)) != nil {
+                    locations[i] = updated
+                    QA.log("Laufwerkskennung aktualisiert: \(loc.name) \(loc.volumeKey) → \(info.key)")
+                }
+            }
             if let i = locations.firstIndex(where: { $0.id == loc.id }) {
                 locations[i].lastKnownPath = url.path
                 locations[i].lastSeenAt = Date()
@@ -629,6 +665,10 @@ final class AppModel: ObservableObject {
             let preference = settings.coverPreference
             let service = metadata
             var index = 0
+            // Oberfläche gebündelt aktualisieren (höchstens alle 0,5 s bzw. je 40 Filme)
+            var pending: [Int64] = []
+            var remaining = metadataRemaining
+            var lastFlush = Date()
             while index < batch.count && !Task.isCancelled {
                 let slice = Array(batch[index..<min(index + 2, batch.count)])
                 index += slice.count
@@ -641,11 +681,18 @@ final class AppModel: ObservableObject {
                         }
                     }
                     for await (id, ok) in group {
-                        if ok { refreshFilm(id) } else { skipped.insert(id) }
-                        metadataRemaining = max(0, metadataRemaining - 1)
+                        if ok { pending.append(id) } else { skipped.insert(id) }
+                        remaining = max(0, remaining - 1)
                     }
                 }
+                if pending.count >= 40 || Date().timeIntervalSince(lastFlush) > 0.5 {
+                    refreshFilms(pending)
+                    pending.removeAll()
+                    metadataRemaining = remaining
+                    lastFlush = Date()
+                }
             }
+            refreshFilms(pending)
         }
         metadataRemaining = 0
     }

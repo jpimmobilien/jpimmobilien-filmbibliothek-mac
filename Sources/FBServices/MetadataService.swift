@@ -169,6 +169,7 @@ public final class MetadataService: @unchecked Sendable {
         var playability = Playability.unsupported
         var avResult: AVProbe.Result? = nil
         var vlcFrame: CGImage? = nil
+        var vlcDecodeTried = false
 
         if film.sizeBytes > 0 {
             let tryAVFirst = VideoFormats.prefersAVFoundation(film.fileExtension) || !VLCSupport.isAvailable
@@ -180,7 +181,8 @@ public final class MetadataService: @unchecked Sendable {
                 }
             }
             if playability != .native, VLCSupport.isAvailable {
-                let (v, image) = await VLCSupport.analyze(url: fileURL)
+                let (v, image, decodeTried) = await VLCSupport.analyze(url: fileURL)
+                vlcDecodeTried = decodeTried
                 if let v {
                     info = v
                     playability = .vlc
@@ -201,7 +203,7 @@ public final class MetadataService: @unchecked Sendable {
         let keepLastFrame = film.coverSource == .lastFrame && covers.hasCover(film.id) && film.metadataVersion > 0
         if !keepLastFrame {
             let made = await makeCover(film: film, fileURL: fileURL, info: info, playability: playability, avResult: avResult,
-                                       vlcFrame: vlcFrame, preference: preference)
+                                       vlcFrame: vlcFrame, vlcDecodeTried: vlcDecodeTried, preference: preference)
             if let made {
                 source = made.0
                 stamp = made.1
@@ -216,7 +218,7 @@ public final class MetadataService: @unchecked Sendable {
     }
 
     private func makeCover(film: Film, fileURL: URL, info: VideoInfo, playability: Playability, avResult: AVProbe.Result?,
-                           vlcFrame: CGImage?, preference: CoverPreference) async -> (CoverSource, Int64)? {
+                           vlcFrame: CGImage?, vlcDecodeTried: Bool, preference: CoverPreference) async -> (CoverSource, Int64)? {
         if preference == .posterFirst {
             // 1. Posterdatei im Ordner
             let folder = fileURL.deletingLastPathComponent()
@@ -243,6 +245,9 @@ public final class MetadataService: @unchecked Sendable {
             if let img = vlcFrame, let stamp = try? covers.save(img, filmId: film.id) {
                 return (.videoFrame, stamp)
             }
+            // Dekodieren wurde bei der Prüfung schon versucht (ohne Bild) → kein zweiter, langsamer Versuch.
+            // Das Titelbild entsteht dann beim ersten Abspielen („zuletzt gesehenes Bild“).
+            if vlcDecodeTried { return nil }
             var w: CGFloat = 640, h: CGFloat = 360
             if let iw = info.width, let ih = info.height, iw > 0, ih > 0 {
                 h = (w * CGFloat(ih) / CGFloat(iw)).rounded()

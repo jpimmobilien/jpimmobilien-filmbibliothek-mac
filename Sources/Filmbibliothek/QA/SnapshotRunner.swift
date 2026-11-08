@@ -163,6 +163,7 @@ enum SnapshotRunner {
             benchmark["alleAnzeigenMillisekunden"] = String(format: "%.0f", Date().timeIntervalSince(t2) * 1000)
             let t3 = Date()
             settings.sortKey = .size
+            settings.sortAscending = false   // größte zuerst
             model.scheduleRecompute()
             try? await Task.sleep(nanoseconds: 50_000_000)
             while model.visibleFilms.first?.sizeBytes != model.films.map(\.sizeBytes).max() && Date().timeIntervalSince(t3) < 15 {
@@ -170,6 +171,7 @@ enum SnapshotRunner {
             }
             benchmark["sortierenMillisekunden"] = String(format: "%.0f", Date().timeIntervalSince(t3) * 1000)
             settings.sortKey = .title
+            settings.sortAscending = true
             for (name, mode) in [("11-viele-dateien-liste", AppSettings.ViewMode.list), ("12-viele-dateien-raster", AppSettings.ViewMode.compactGrid)] {
                 settings.viewMode = mode
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
