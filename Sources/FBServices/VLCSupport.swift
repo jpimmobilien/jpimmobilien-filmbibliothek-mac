@@ -26,7 +26,7 @@ public enum VLCSupport {
     public static func probe(url: URL, timeout: TimeInterval = 10) async -> VideoInfo? {
         let media = VLCMedia(url: url)
         // Optionen: 0 = nur lokal parsen (VLCMediaParseLocal)
-        _ = media.parse(withOptions: VLCMediaParsingOptions(rawValue: 0), timeout: Int32(timeout * 1000))
+        _ = media.parse(options: VLCMediaParsingOptions(rawValue: 0), timeout: Int32(timeout * 1000))
         let deadline = Date().addingTimeInterval(timeout + 1)
         // Status: 0 init, 1 skipped, 2 failed, 3 timeout, 4 done
         while media.parsedStatus.rawValue < 2 && Date() < deadline {

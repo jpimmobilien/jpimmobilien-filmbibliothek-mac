@@ -82,7 +82,7 @@ public final class LibraryStore: @unchecked Sendable {
 
     public func updateLocation(_ l: StorageLocation) throws {
         try sync { db in
-            try db.run("""
+            _ = try db.run("""
                 UPDATE locations SET name = ?, lastKnownPath = ?, pathInVolume = ?, volumeKey = ?, volumeName = ?, kind = ?,
                 bookmark = ?, lastScanAt = ?, lastSeenAt = ? WHERE id = ?
                 """, [.text(l.name), .text(l.lastKnownPath), .text(l.pathInVolume), .text(l.volumeKey), .text(l.volumeName),

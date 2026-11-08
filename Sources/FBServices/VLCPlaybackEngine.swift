@@ -139,7 +139,7 @@ public final class VLCPlaybackEngine: NSObject, PlaybackEngine {
     }
 
     private func loadChapters() {
-        let list = player.chapterDescriptions(ofTitle: player.currentTitleIndex) ?? []
+        let list: [Any] = player.chapterDescriptions(ofTitle: player.currentTitleIndex)
         var marks: [ChapterMark] = []
         for (i, entry) in list.enumerated() {
             guard let d = entry as? [String: Any] else { continue }
