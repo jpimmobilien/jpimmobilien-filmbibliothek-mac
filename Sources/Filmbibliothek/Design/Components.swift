@@ -35,7 +35,7 @@ struct CapsuleButtonStyle: ButtonStyle {
                         .foregroundColor(p.onAccent)
                         .background(Capsule(style: .continuous).fill(p.accent.opacity(hover ? 1 : 0.92)))
                         .overlay(Capsule(style: .continuous).strokeBorder(Color.white.opacity(0.22), lineWidth: 0.6))
-                        .shadow(color: p.accent.opacity(0.35), radius: hover ? 10 : 6, y: 2)
+                        .safeShadow(color: p.accent.opacity(0.35), radius: hover ? 10 : 6, y: 2)
                 case .destructive:
                     label
                         .foregroundColor(p.red)
@@ -182,7 +182,7 @@ struct StatusDot: View {
         Circle()
             .fill(color)
             .frame(width: size, height: size)
-            .shadow(color: color.opacity(0.7), radius: pulsing ? (on ? 5 : 1) : 2)
+            .safeShadow(color: color.opacity(0.7), radius: pulsing ? (on ? 5 : 1) : 2)
             .onAppear {
                 guard pulsing else { return }
                 withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { on = true }

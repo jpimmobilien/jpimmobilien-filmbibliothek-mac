@@ -13,7 +13,7 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Color.clear.frame(height: 34) // Platz für die Fensterknöpfe
+                    Color.clear.frame(height: 30) // Platz für die Fensterknöpfe
                     SidebarRow(title: "Übersicht", systemImage: "sparkles.tv", color: p.accent,
                                selected: model.route == .overview) { model.navigate(.overview) }
 
@@ -287,12 +287,40 @@ struct SettingsLinkRow: View {
 }
 
 enum SettingsOpener {
+    /// macOS 14+: offizielle SwiftUI-Aktion `openSettings` (wird von `SettingsActionBridge` hinterlegt)
+    @MainActor static var action: (() -> Void)?
+
     @MainActor
     static func open() {
-        // Offizieller Menübefehl „Einstellungen …“ (macOS 13: showSettingsWindow:, ältere: showPreferencesWindow:)
+        NSApp.activate(ignoringOtherApps: true)
+        if let action {
+            action()
+            return
+        }
+        // macOS 13: Menübefehl „Einstellungen …“ des Settings-Fensters
         if !NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) {
             NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
         }
-        NSApp.activate(ignoringOtherApps: true)
+    }
+}
+
+/// Hinterlegt auf macOS 14+ die Aktion zum Öffnen der Einstellungen.
+struct SettingsActionBridge: View {
+    var body: some View {
+        if #available(macOS 14.0, *) {
+            Bridge14()
+        } else {
+            Color.clear.frame(width: 0, height: 0)
+        }
+    }
+
+    @available(macOS 14.0, *)
+    private struct Bridge14: View {
+        @Environment(\.openSettings) private var openSettings
+        var body: some View {
+            Color.clear
+                .frame(width: 0, height: 0)
+                .onAppear { SettingsOpener.action = { openSettings() } }
+        }
     }
 }

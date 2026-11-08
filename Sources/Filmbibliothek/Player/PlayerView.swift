@@ -27,7 +27,7 @@ struct PlayerView: View {
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
-                        .shadow(color: .black.opacity(0.9), radius: 3, x: 0, y: 1)
+                        .safeShadow(color: .black.opacity(0.9), radius: 3, x: 0, y: 1)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 8)
                         .background(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.35)))
@@ -185,8 +185,6 @@ struct PlayerView: View {
         Image(systemName: systemImage)
             .font(.system(size: 13, weight: .semibold))
             .foregroundColor(active ? p.accent : .white)
-            .frame(width: 30, height: 30)
-            .glass(Circle(), kind: .overlay, interactive: true)
     }
 
     private var speedMenu: some View {
@@ -201,13 +199,13 @@ struct PlayerView: View {
         } label: {
             Text(SeekMath.speedLabel(controller.rate))
                 .font(.system(size: 10.5, weight: .bold).monospacedDigit())
-                .foregroundColor(abs(controller.rate - 1) > 0.01 ? p.accent : .white)
-                .frame(width: 30, height: 30)
-                .glass(Circle(), kind: .overlay, interactive: true)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .tint(abs(controller.rate - 1) > 0.01 ? p.accent : .white)
+        .frame(width: 34, height: 30)
+        .glass(Capsule(), kind: .overlay, interactive: true)
         .help("Geschwindigkeit ([ und ])")
     }
 
@@ -247,6 +245,9 @@ struct PlayerView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .tint(controller.selectedSubtitle != nil || controller.activeExternalSubtitle != nil ? p.accent : .white)
+        .frame(width: 30, height: 30)
+        .glass(Circle(), kind: .overlay, interactive: true)
         .help("Ton, Untertitel und Warteschlange")
     }
 
@@ -261,6 +262,9 @@ struct PlayerView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .tint(.white)
+        .frame(width: 30, height: 30)
+        .glass(Circle(), kind: .overlay, interactive: true)
         .help("Kapitel (, und .)")
     }
 
@@ -345,7 +349,7 @@ struct Scrubber: View {
                     }
                 }
                 Circle().fill(Color.white).frame(width: 13, height: 13)
-                    .shadow(color: .black.opacity(0.4), radius: 3)
+                    .safeShadow(color: .black.opacity(0.4), radius: 3)
                     .offset(x: w * fraction - 6.5)
                     .opacity(hoverX != nil || controller.scrubbing != nil ? 1 : 0)
                 if let x = hoverX, d > 0 {

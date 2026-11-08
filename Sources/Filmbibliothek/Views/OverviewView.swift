@@ -41,7 +41,7 @@ struct OverviewView: View {
                 }
             }
             .padding(.horizontal, 30)
-            .padding(.top, 26)
+            .padding(.top, 24)
             .padding(.bottom, 36)
         }
     }
@@ -127,7 +127,7 @@ struct OverviewView: View {
     // MARK: - Karten
 
     private var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300, maximum: 600), spacing: 16)], alignment: .leading, spacing: 16) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 300, maximum: 600), spacing: 16, alignment: .top)], alignment: .leading, spacing: 16) {
             libraryCard
             playbackCard
             formatsCard
@@ -253,7 +253,7 @@ struct HeroCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            CoverImage(film: film, aspect: 21.0 / 9.0, showPlaceholderTitle: false)
+            CoverImage(film: film, aspect: 21.0 / 9.0, showPlaceholderTitle: false, fill: true)
                 .frame(maxWidth: .infinity)
                 .frame(height: 340)
                 .clipped()
@@ -272,7 +272,7 @@ struct HeroCard: View {
                     .foregroundColor(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.6)
-                    .shadow(color: .black.opacity(0.4), radius: 12)
+                    .safeShadow(color: .black.opacity(0.4), radius: 12)
                 HStack(spacing: 8) {
                     ForEach(chips, id: \.self) { c in
                         Text(c)
@@ -305,7 +305,7 @@ struct HeroCard: View {
         .frame(height: 340)
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8))
-        .shadow(color: p.shadow, radius: 22, y: 10)
+        .safeShadow(color: p.shadow, radius: 22, y: 10)
         .contextMenu { FilmContextMenu(film: film) }
     }
 

@@ -143,7 +143,7 @@ final class AppModel: ObservableObject {
     func bootstrap() async {
         guard !isBootstrapped else { return }
         isBootstrapped = true
-        QA.log("Start: macOS \(ProcessInfo.processInfo.operatingSystemVersionString), \(QA.architecture), \(LiquidGlass.modeDescription), VLCKit: \(VLCSupport.isAvailable)")
+        QA.log("Start: macOS \(ProcessInfo.processInfo.operatingSystemVersionString), \(QA.architecture), \(LiquidGlass.modeDescription), VLCKit: \(VLCSupport.isAvailable), Grafik: \(RenderSafety.gpuName), reduzierte Effekte: \(RenderSafety.reducedEffects)")
         reloadFromStore()
         let m = VolumeMonitor { [weak self] event in self?.handle(event) }
         m.start()

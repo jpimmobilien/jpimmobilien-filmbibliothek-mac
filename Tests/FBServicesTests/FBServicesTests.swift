@@ -181,7 +181,8 @@ final class MetadataTests: XCTestCase {
 
     func testAVFoundationReadsAppleFormats() async throws {
         for (file, codec) in [("Testfilm MP4.mp4", "H.264"), ("Testfilm MP4 (HEVC).mp4", "HEVC (H.265)"), ("Testfilm M4V.m4v", "H.264"), ("Testfilm MOV.mov", "H.264")] {
-            let r = try XCTUnwrap(await AVProbe.probe(url: url(file)), file)
+            let probed = await AVProbe.probe(url: url(file))
+            let r = try XCTUnwrap(probed, file)
             XCTAssertTrue(r.playable, file)
             XCTAssertEqual(r.info.width, 320, file)
             XCTAssertEqual(r.info.height, 180, file)
@@ -190,7 +191,8 @@ final class MetadataTests: XCTestCase {
             XCTAssertEqual(r.info.audioCodec, "AAC", file)
             XCTAssertEqual(r.info.frameRate ?? 0, 25, accuracy: 0.5, file)
         }
-        let mp4 = try XCTUnwrap(await AVProbe.probe(url: url("Testfilm MP4.mp4")))
+        let probedMP4 = await AVProbe.probe(url: url("Testfilm MP4.mp4"))
+        let mp4 = try XCTUnwrap(probedMP4)
         XCTAssertEqual(mp4.chapters.map(\.title), ["Anfang", "Schluss"])
         XCTAssertNotNil(mp4.artwork, "eingebettetes Cover")
     }
@@ -208,17 +210,22 @@ final class MetadataTests: XCTestCase {
         let files = ["Testfilm MKV.mkv", "Testfilm AVI.avi", "Testfilm WMV.wmv", "Testfilm MPG.mpg", "Testfilm MPEG.mpeg", "Testfilm TS.ts",
                      "Testfilm M2TS.m2ts", "Testfilm WEBM.webm", "Testfilm FLV.flv", "Serien/Staffel 1/Kamera 00001.mts"]
         for f in files {
-            let info = try XCTUnwrap(await VLCSupport.probe(url: url(f)), f)
+            let analyzed = await VLCSupport.analyze(url: url(f))
+            let info = try XCTUnwrap(analyzed.0, f)
             XCTAssertEqual(info.durationSeconds ?? 0, 6, accuracy: 0.6, f)
             XCTAssertEqual(info.width, 320, f)
             XCTAssertEqual(info.height, 180, f)
             XCTAssertGreaterThanOrEqual(info.audioTrackCount, 1, f)
             print("VLC \(f): \(info.videoCodec ?? "-") / \(info.audioCodec ?? "-") / \(info.frameRate ?? 0) fps")
         }
-        let mkv = try XCTUnwrap(await VLCSupport.probe(url: url("Testfilm MKV.mkv")))
+        let probedMKV = await VLCSupport.probe(url: url("Testfilm MKV.mkv"))
+        let mkv = try XCTUnwrap(probedMKV)
         XCTAssertEqual(mkv.audioTrackCount, 2)
         XCTAssertEqual(mkv.subtitleTrackCount, 1)
-        XCTAssertNil(await VLCSupport.probe(url: url("Kaputt/Textdatei.avi")))
+        let text = await VLCSupport.analyze(url: url("Kaputt/Textdatei.avi"))
+        XCTAssertNil(text.0, "Textdatei ist kein Video")
+        let random = await VLCSupport.analyze(url: url("Kaputt/Zufallsdaten.mp4"))
+        XCTAssertNil(random.0, "Zufallsdaten sind kein Video")
     }
 
     @MainActor
@@ -242,7 +249,8 @@ final class MetadataTests: XCTestCase {
             XCTAssertEqual(films[f]?.playability, .native, f)
         }
         if VLCSupport.isAvailable {
-            for f in ["Testfilm MKV.mkv", "Testfilm AVI.avi", "Testfilm WMV.wmv", "Testfilm WEBM.webm", "Testfilm FLV.flv", "Testfilm TS.ts"] {
+            for f in ["Testfilm MKV.mkv", "Testfilm AVI.avi", "Testfilm WMV.wmv", "Testfilm WEBM.webm", "Testfilm FLV.flv", "Testfilm TS.ts",
+                      "Testfilm MPG.mpg", "Testfilm MPEG.mpeg", "Testfilm M2TS.m2ts", "Serien/Staffel 1/Kamera 00001.mts"] {
                 XCTAssertEqual(films[f]?.playability, .vlc, f)
             }
         }

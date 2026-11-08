@@ -102,7 +102,7 @@ struct GlassSurface<S: InsettableShape>: ViewModifier {
             let glass = interactive ? Glass.regular.tint(glassTint).interactive() : Glass.regular.tint(glassTint)
             content
                 .glassEffect(glass, in: shape)
-                .shadow(color: elevated ? p.shadow : .clear, radius: elevated ? 18 : 0, y: elevated ? 8 : 0)
+                .safeShadow(color: elevated ? p.shadow : .clear, radius: elevated ? 18 : 0, y: elevated ? 8 : 0)
         } else {
             fallback(content)
         }
@@ -133,8 +133,8 @@ struct GlassSurface<S: InsettableShape>: ViewModifier {
                     lineWidth: kind == .overlay ? 0.6 : 0.8
                 )
             )
-            .compositingGroup()
-            .shadow(color: elevated ? p.shadow : .clear, radius: elevated ? 18 : 0, x: 0, y: elevated ? 8 : 0)
+            .safeCompositingGroup()
+            .safeShadow(color: elevated ? p.shadow : .clear, radius: elevated ? 18 : 0, x: 0, y: elevated ? 8 : 0)
     }
 }
 
@@ -183,9 +183,11 @@ struct AmbientBackground: View {
             let r = max(w, h) * 0.62
             ZStack {
                 LinearGradient(colors: p.backgroundStops, startPoint: .topLeading, endPoint: .bottomTrailing)
-                RadialGradient(colors: [p.glows[0], .clear], center: UnitPoint(x: 0.12, y: 0.0), startRadius: 0, endRadius: r)
-                RadialGradient(colors: [accentGlow?.opacity(p.dark ? 0.32 : 0.22) ?? p.glows[1], .clear], center: UnitPoint(x: 0.95, y: 0.05), startRadius: 0, endRadius: r * 0.9)
-                RadialGradient(colors: [p.glows[2], .clear], center: UnitPoint(x: 0.35, y: 1.05), startRadius: 0, endRadius: r)
+                if !RenderSafety.reducedEffects {
+                    RadialGradient(colors: [p.glows[0], .clear], center: UnitPoint(x: 0.12, y: 0.0), startRadius: 0, endRadius: r)
+                    RadialGradient(colors: [accentGlow?.opacity(p.dark ? 0.32 : 0.22) ?? p.glows[1], .clear], center: UnitPoint(x: 0.95, y: 0.05), startRadius: 0, endRadius: r * 0.9)
+                    RadialGradient(colors: [p.glows[2], .clear], center: UnitPoint(x: 0.35, y: 1.05), startRadius: 0, endRadius: r)
+                }
             }
             .animation(.easeInOut(duration: 1.0), value: accentGlow)
         }

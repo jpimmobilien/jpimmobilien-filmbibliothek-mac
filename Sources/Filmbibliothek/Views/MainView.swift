@@ -24,10 +24,13 @@ struct MainView: View {
                 content
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            // Seitenleiste und Inhalt reichen bis zur Fensteroberkante (Fensterknöpfe liegen auf der Glasleiste)
+            .ignoresSafeArea(.container, edges: .top)
             if model.dropTargeted { dropOverlay }
         }
         .overlay(alignment: .bottom) { toastView }
         .background(WindowConfigurator())
+        .background(SettingsActionBridge())
         .onDrop(of: [UTType.fileURL], isTargeted: $model.dropTargeted) { providers in
             handleDrop(providers)
         }
@@ -126,7 +129,7 @@ struct MainView: View {
             .padding(.horizontal, 18)
             .padding(.vertical, 11)
             .glassCapsule(kind: .card, interactive: false)
-            .shadow(color: p.shadow, radius: 16, y: 6)
+            .safeShadow(color: p.shadow, radius: 16, y: 6)
             .padding(.bottom, 22)
             .padding(.leading, model.sidebarVisible ? 254 : 0)
             .transition(.move(edge: .bottom).combined(with: .opacity))

@@ -11,17 +11,23 @@ struct CoverImage: View {
     let film: Film
     var aspect: CGFloat
     var showPlaceholderTitle = true
+    /// Füllt den vom Aufrufer vorgegebenen Rahmen (Kinobild, Hintergrund) statt ein Seitenverhältnis vorzugeben
+    var fill = false
     @State private var image: NSImage?
     @State private var loadedKey: String?
 
     private var key: String { "\(film.id)-\(film.coverStamp)" }
 
     var body: some View {
-        Color.clear
-            .aspectRatio(aspect, contentMode: .fit)
-            .overlay(content)
-            .clipped()
-            .task(id: key) { await load() }
+        Group {
+            if fill {
+                Color.clear.overlay(content)
+            } else {
+                Color.clear.aspectRatio(aspect, contentMode: .fit).overlay(content)
+            }
+        }
+        .clipped()
+        .task(id: key) { await load() }
     }
 
     @ViewBuilder
@@ -31,9 +37,9 @@ struct CoverImage: View {
             if abs(imgAspect - aspect) / aspect > 0.28 {
                 // Poster im Breitbild (bzw. umgekehrt): unscharfer Hintergrund + ganzes Bild
                 ZStack {
-                    Image(nsImage: image).resizable().scaledToFill().blur(radius: 18).opacity(0.75)
+                    Image(nsImage: image).resizable().scaledToFill().safeBlur(radius: 18).opacity(0.75)
                     Color.black.opacity(0.18)
-                    Image(nsImage: image).resizable().scaledToFit().shadow(color: .black.opacity(0.4), radius: 8)
+                    Image(nsImage: image).resizable().scaledToFit().safeShadow(color: .black.opacity(0.4), radius: 8)
                 }
             } else {
                 Image(nsImage: image).resizable().scaledToFill()
@@ -114,7 +120,7 @@ struct FilmTile: View {
                 RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous)
                     .strokeBorder(selected ? p.accent : Color.white.opacity(hover ? 0.28 : 0.10), lineWidth: selected ? 2.4 : 0.8)
             )
-            .shadow(color: p.shadow.opacity(hover ? 1 : 0.7), radius: hover ? 16 : 9, y: hover ? 8 : 4)
+            .safeShadow(color: p.shadow.opacity(hover ? 1 : 0.7), radius: hover ? 16 : 9, y: hover ? 8 : 4)
             .scaleEffect(hover ? 1.015 : 1)
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: hover)
 

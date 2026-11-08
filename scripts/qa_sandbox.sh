@@ -58,9 +58,9 @@ grep -q "bookmark=true" "$LOG" && ok "Lesezeichen gespeichert" || fail "kein Les
 grep "QA-RESULT films total" "$LOG" | tail -1
 
 echo "▸ 2. Laufwerk auswerfen"
+M=$(mark)
 hdiutil detach "$MNT" >/dev/null 2>&1 || hdiutil detach "$MNT" -force >/dev/null
 MNT=""
-M=$(mark)
 if wait_new "$M" "Laufwerk ausgeworfen" 30; then ok "Auswerfen erkannt"; else fail "Auswerfen nicht erkannt"; fi
 sleep 2
 M=$(mark)

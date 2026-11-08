@@ -64,7 +64,7 @@ enum SnapshotRunner {
         try? await Task.sleep(nanoseconds: 1_000_000_000)
 
         let firstNative = sorted.first { $0.playability == .native && $0.coverSource != CoverSource.none }
-        let firstVLC = sorted.first { $0.playability == .vlc }
+        let firstVLC = sorted.first { $0.relativePath == "Testfilm MKV.mkv" } ?? sorted.first { $0.playability == .vlc && !$0.relativePath.hasPrefix("Kaputt/") }
         let main = CGSize(width: 1440, height: 900)
         var shots: [Shot] = [
             Shot(name: "01-uebersicht", size: main) { m, _ in m.navigate(.overview) },

@@ -16,7 +16,7 @@ struct LibraryView: View {
         VStack(alignment: .leading, spacing: 0) {
             header
                 .padding(.horizontal, 30)
-                .padding(.top, 26)
+                .padding(.top, 24)
                 .padding(.bottom, 12)
             if !model.filter.isEmpty || !model.searchText.isEmpty || folderPath != nil {
                 chipsRow
@@ -123,14 +123,14 @@ struct LibraryView: View {
                 Image(systemName: "arrow.up.arrow.down").font(.system(size: 11, weight: .semibold))
                 Text(scope.impliedSort == nil ? settings.sortKey.label : "Automatisch").font(.system(size: 12.5, weight: .semibold))
             }
-            .foregroundColor(p.textPrimary)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
-            .glassCapsule()
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .tint(p.textPrimary)
+        .padding(.horizontal, 12)
+        .frame(height: 32)
+        .glassCapsule()
         .disabled(scope.impliedSort != nil)
         .help(scope.impliedSort == nil ? "Sortierung" : "Dieser Bereich ist nach Datum sortiert")
     }

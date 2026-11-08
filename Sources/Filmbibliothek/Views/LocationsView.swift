@@ -29,7 +29,7 @@ struct LocationsView: View {
                 HintBar(text: "Die Filmbibliothek sieht nur Ordner, die Sie hier hinzufügen, und darf sie nur lesen (App-Sandbox). macOS merkt sich die Freigabe dauerhaft. Wird ein Laufwerk abgezogen, bleiben seine Filme mit Titelbild und Fortschritt erhalten und werden beim nächsten Anschließen an der Laufwerkskennung wiedererkannt.")
             }
             .padding(.horizontal, 30)
-            .padding(.top, 26)
+            .padding(.top, 24)
             .padding(.bottom, 36)
         }
     }
@@ -171,12 +171,13 @@ struct LocationCard: View {
                 } label: {
                     Image(systemName: "ellipsis")
                         .font(.system(size: 12, weight: .bold))
-                        .frame(width: 28, height: 28)
-                        .glass(Circle(), kind: .control, interactive: true)
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
                 .fixedSize()
+                .tint(p.textPrimary)
+                .frame(width: 28, height: 28)
+                .glass(Circle(), kind: .control, interactive: true)
             }
         }
     }

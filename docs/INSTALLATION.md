@@ -1,0 +1,52 @@
+# Installation
+
+```
+FILMBIBLIOTHEK FÜR macOS – INSTALLATION
+=======================================
+
+Voraussetzung: macOS 13 Ventura oder neuer, Mac mit Apple Silicon (M1 und neuer) oder Intel.
+Eine einzige App für beide Prozessoren (Universal) – Rosetta wird nicht benötigt.
+
+1. Ziehen Sie „Filmbibliothek“ in dieser Datei-Ansicht auf „Applications“ (Programme).
+2. Werfen Sie danach das Laufwerk „Filmbibliothek“ aus (Finder → Auswerfen).
+3. Öffnen Sie die Filmbibliothek aus dem Programme-Ordner.
+
+ERSTER START (wichtig)
+----------------------
+Diese Version ist nicht mit einem Apple-Developer-ID-Zertifikat signiert und nicht von Apple
+beglaubigt („notarisiert“) – dafür ist ein kostenpflichtiges Apple-Entwicklerkonto nötig.
+macOS fragt deshalb beim ersten Öffnen nach:
+
+  macOS 13 und 14:  Rechtsklick (oder ctrl-Klick) auf die App → „Öffnen“ → „Öffnen“ bestätigen.
+  macOS 15 und 26:  App einmal normal öffnen (macOS lehnt ab) → Systemeinstellungen →
+                    „Datenschutz & Sicherheit“ → ganz unten bei „Filmbibliothek“ auf
+                    „Dennoch öffnen“ klicken → mit Passwort bzw. Touch ID bestätigen.
+
+Danach startet die App normal. Das ist der von Apple vorgesehene Weg; die Sicherheitsfunktionen
+von macOS werden dabei nicht abgeschaltet.
+
+FILME HINZUFÜGEN
+----------------
+„Speicherort hinzufügen“ (⌘O) oder einen Ordner bzw. ein ganzes Laufwerk aus dem Finder in das
+Fenster oder auf das Dock-Symbol ziehen. Unterstützt: interne SSD, externe SSD/Festplatte,
+USB-Stick, SD-Karte, Netzlaufwerk (vorher im Finder verbinden).
+
+Die App darf gewählte Ordner nur LESEN (App-Sandbox). Sie verändert, verschiebt oder löscht keine
+Datei, braucht kein Konto und hat keinen Internetzugang.
+
+Wird ein Laufwerk abgezogen, bleiben seine Filme mit Titelbild und Fortschritt als „nicht verfügbar“
+erhalten und werden beim nächsten Anschließen automatisch wiedererkannt.
+
+HINWEIS ZU UPDATES
+------------------
+Weil die App ohne Developer-ID signiert ist, kann es vorkommen, dass macOS nach dem Ersetzen durch
+eine neue Version den gespeicherten Ordnerzugriff nicht mehr zuordnet und beim Start nachfragt, ob
+die App auf ihre Daten zugreifen darf (bitte erlauben). Zeigt ein Speicherort danach „Kein Zugriff“,
+genügt ein Klick auf „Zugriff erteilen …“ und die Auswahl des Ordners. Bibliothek, Favoriten und
+Fortschritt bleiben dabei erhalten.
+
+DEINSTALLIEREN
+--------------
+App aus dem Programme-Ordner in den Papierkorb legen. Die Bibliotheksdaten liegen in
+~/Library/Containers/de.privateapp.filmbibliothek (kann ebenfalls gelöscht werden).
+```

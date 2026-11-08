@@ -30,7 +30,7 @@ struct FilmDetailView: View {
                 infoCards
             }
             .padding(.horizontal, 30)
-            .padding(.top, 26)
+            .padding(.top, 24)
             .padding(.bottom, 36)
         }
     }
@@ -43,7 +43,7 @@ struct FilmDetailView: View {
                 .frame(width: settings.tileShape == .widescreen ? 380 : 220)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.14), lineWidth: 0.8))
-                .shadow(color: p.shadow, radius: 20, y: 10)
+                .safeShadow(color: p.shadow, radius: 20, y: 10)
                 .saturation(available ? 1 : 0.2)
             VStack(alignment: .leading, spacing: 10) {
                 Text(model.locationName(film.locationId).uppercased() + (film.folder.isEmpty ? "" : " · " + film.folder.uppercased()))
@@ -70,8 +70,8 @@ struct FilmDetailView: View {
         }
         .padding(22)
         .background(
-            CoverImage(film: film, aspect: 3, showPlaceholderTitle: false)
-                .blur(radius: 50)
+            CoverImage(film: film, aspect: 3, showPlaceholderTitle: false, fill: true)
+                .safeBlur(radius: 50)
                 .opacity(p.dark ? 0.35 : 0.25)
                 .clipped()
         )
@@ -137,12 +137,13 @@ struct FilmDetailView: View {
             } label: {
                 Image(systemName: "rectangle.stack.badge.plus")
                     .font(.system(size: 13, weight: .semibold))
-                    .frame(width: 34, height: 34)
-                    .glass(Circle(), kind: .control, interactive: true)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .fixedSize()
+            .tint(p.textPrimary)
+            .frame(width: 34, height: 34)
+            .glass(Circle(), kind: .control, interactive: true)
             .help("Zur Sammlung hinzufügen")
             Button { model.revealInFinder([film]) } label: { Image(systemName: "folder") }
                 .buttonStyle(GlassIconButtonStyle(size: 34))
@@ -154,7 +155,7 @@ struct FilmDetailView: View {
     // MARK: - Infokarten
 
     private var infoCards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 700), spacing: 16)], alignment: .leading, spacing: 16) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 700), spacing: 16, alignment: .top)], alignment: .leading, spacing: 16) {
             GlassCard(title: "Video", systemImage: "film", iconColor: p.accent) {
                 VStack(spacing: 9) {
                     InfoRow(label: "Auflösung", value: Fmt.resolution(film.info.width, film.info.height).map { r in film.resolutionClass.map { "\(r) (\($0.label))" } ?? r } ?? "–")

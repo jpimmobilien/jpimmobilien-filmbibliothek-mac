@@ -154,6 +154,7 @@ public final class MetadataService: @unchecked Sendable {
         var info = VideoInfo()
         var playability = Playability.unsupported
         var avResult: AVProbe.Result? = nil
+        var vlcFrame: CGImage? = nil
 
         if film.sizeBytes > 0 {
             let tryAVFirst = VideoFormats.prefersAVFoundation(film.fileExtension) || !VLCSupport.isAvailable
@@ -164,9 +165,13 @@ public final class MetadataService: @unchecked Sendable {
                     playability = .native
                 }
             }
-            if playability != .native, VLCSupport.isAvailable, let v = await VLCSupport.probe(url: fileURL) {
-                info = v
-                playability = .vlc
+            if playability != .native, VLCSupport.isAvailable {
+                let (v, image) = await VLCSupport.analyze(url: fileURL)
+                if let v {
+                    info = v
+                    playability = .vlc
+                    vlcFrame = image
+                }
             }
             if playability == .unsupported, let r = avResult {
                 info = r.info // Angaben trotzdem anzeigen (z. B. Dauer), auch wenn nicht abspielbar
@@ -181,7 +186,8 @@ public final class MetadataService: @unchecked Sendable {
         var stamp = film.coverStamp
         let keepLastFrame = film.coverSource == .lastFrame && covers.hasCover(film.id) && film.metadataVersion > 0
         if !keepLastFrame {
-            let made = await makeCover(film: film, fileURL: fileURL, info: info, playability: playability, avResult: avResult, preference: preference)
+            let made = await makeCover(film: film, fileURL: fileURL, info: info, playability: playability, avResult: avResult,
+                                       vlcFrame: vlcFrame, preference: preference)
             if let made {
                 source = made.0
                 stamp = made.1
@@ -196,7 +202,7 @@ public final class MetadataService: @unchecked Sendable {
     }
 
     private func makeCover(film: Film, fileURL: URL, info: VideoInfo, playability: Playability, avResult: AVProbe.Result?,
-                           preference: CoverPreference) async -> (CoverSource, Int64)? {
+                           vlcFrame: CGImage?, preference: CoverPreference) async -> (CoverSource, Int64)? {
         if preference == .posterFirst {
             // 1. Posterdatei im Ordner
             let folder = fileURL.deletingLastPathComponent()
@@ -227,6 +233,10 @@ public final class MetadataService: @unchecked Sendable {
             let width = w, height = h
             if let img = await VLCSupport.thumbnail(url: fileURL, position: 0.12, width: width, height: height),
                let stamp = try? covers.save(img, filmId: film.id) {
+                return (.videoFrame, stamp)
+            }
+            // Ersatz: Einzelbild aus der gründlichen Prüfung (z. B. Transportströme)
+            if let img = vlcFrame, let stamp = try? covers.save(img, filmId: film.id) {
                 return (.videoFrame, stamp)
             }
         default:
