@@ -152,11 +152,11 @@ final class SearchFilterSortTests: XCTestCase {
 
     func testNaturalSortAndTies() {
         let list = [film(1, "Folge 10.mkv"), film(2, "Folge 2.mkv"), film(3, "folge 1.mkv")]
-        let sorted = LibrarySorter.sort(list, by: SortOrder(key: .title, ascending: true))
+        let sorted = LibrarySorter.sort(list, by: LibrarySortOrder(key: .title, ascending: true))
         XCTAssertEqual(sorted.map(\.id), [3, 2, 1])
-        let bySize = LibrarySorter.sort([film(1, "a", size: 5), film(2, "b", size: 9), film(3, "c", size: 5)], by: SortOrder(key: .size, ascending: false))
+        let bySize = LibrarySorter.sort([film(1, "a", size: 5), film(2, "b", size: 9), film(3, "c", size: 5)], by: LibrarySortOrder(key: .size, ascending: false))
         XCTAssertEqual(bySize.map(\.id), [2, 1, 3])
-        let byDuration = LibrarySorter.sort([film(1, "a", duration: nil), film(2, "b", duration: 10)], by: SortOrder(key: .duration, ascending: false))
+        let byDuration = LibrarySorter.sort([film(1, "a", duration: nil), film(2, "b", duration: 10)], by: LibrarySortOrder(key: .duration, ascending: false))
         XCTAssertEqual(byDuration.map(\.id), [2, 1], "unbekannte Dauer steht absteigend am Ende")
     }
 }

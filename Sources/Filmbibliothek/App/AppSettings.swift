@@ -114,8 +114,8 @@ final class AppSettings: ObservableObject {
 
     private func save(_ key: String, _ value: Any) { defaults.set(value, forKey: key) }
 
-    var sortOrder: SortOrder {
-        get { SortOrder(key: sortKey, ascending: sortAscending) }
+    var sortOrder: LibrarySortOrder {
+        get { LibrarySortOrder(key: sortKey, ascending: sortAscending) }
         set { sortKey = newValue.key; sortAscending = newValue.ascending }
     }
 

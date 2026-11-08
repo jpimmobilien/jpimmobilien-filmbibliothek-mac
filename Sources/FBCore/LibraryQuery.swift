@@ -233,7 +233,7 @@ public enum SortKey: String, CaseIterable, Sendable, Codable {
     }
 }
 
-public struct SortOrder: Equatable, Sendable, Codable {
+public struct LibrarySortOrder: Equatable, Sendable, Codable {
     public var key: SortKey
     public var ascending: Bool
 
@@ -249,7 +249,7 @@ public enum LibrarySorter {
         a.compare(b, options: [.caseInsensitive, .numeric, .diacriticInsensitive, .widthInsensitive], range: nil, locale: Locale(identifier: "de_DE"))
     }
 
-    public static func sort(_ films: [Film], by order: SortOrder) -> [Film] {
+    public static func sort(_ films: [Film], by order: LibrarySortOrder) -> [Film] {
         films.sorted { a, b in
             let r = compare(a, b, key: order.key)
             if r != .orderedSame { return order.ascending ? r == .orderedAscending : r == .orderedDescending }
@@ -327,10 +327,10 @@ public enum LibraryScope: Hashable, Sendable {
     }
 
     /// Feste Sortierung, die in diesem Bereich sinnvoll ist (nil = Nutzerauswahl gilt)
-    public var impliedSort: SortOrder? {
+    public var impliedSort: LibrarySortOrder? {
         switch self {
-        case .recentlyAdded: return SortOrder(key: .dateAdded, ascending: false)
-        case .recentlyPlayed, .continueWatching: return SortOrder(key: .lastPlayed, ascending: false)
+        case .recentlyAdded: return LibrarySortOrder(key: .dateAdded, ascending: false)
+        case .recentlyPlayed, .continueWatching: return LibrarySortOrder(key: .lastPlayed, ascending: false)
         default: return nil
         }
     }
