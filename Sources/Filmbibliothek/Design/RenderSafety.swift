@@ -22,7 +22,7 @@ extension View {
         if RenderSafety.reducedEffects {
             self
         } else {
-            self.safeShadow(color: color, radius: radius, x: x, y: y)
+            self.shadow(color: color, radius: radius, x: x, y: y)
         }
     }
 
@@ -42,7 +42,7 @@ extension View {
         if RenderSafety.reducedEffects {
             self
         } else {
-            self.safeCompositingGroup()
+            self.compositingGroup()
         }
     }
 }

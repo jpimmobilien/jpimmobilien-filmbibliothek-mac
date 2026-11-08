@@ -71,9 +71,11 @@ jobs:
         run: |
           set -o pipefail
           scripts/qa_sandbox.sh build/Filmbibliothek.app qa/macos26-sandbox 2>&1 | tee logs/sandbox-macos26.txt
-      - name: Vorschaubilder (Liquid Glass)
+      - name: Vorschaubilder (Liquid Glass) + Messlauf mit 5.000 Dateien
         id: snap_glass
         continue-on-error: true
+        env:
+          SNAPSHOT_MANY: "5000"
         run: scripts/run_snapshots.sh build/QA/Filmbibliothek.app snapshots/macos26-liquid-glass
       - name: Vorschaubilder (Rückfall ohne Liquid Glass)
         id: snap_fallback

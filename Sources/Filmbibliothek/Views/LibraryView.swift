@@ -68,19 +68,29 @@ struct LibraryView: View {
         return nil
     }
 
+    /// Breites Fenster: Titel links, Werkzeugleiste rechts. Schmales Fenster: Werkzeugleiste unter dem Titel.
     private var header: some View {
-        PageHeader(title: title, subtitle: subtitle) {
-            GlassGroup(spacing: 8) {
-                HStack(spacing: 8) {
-                    GlassSearchField(text: $model.searchText, prompt: "Titel, Datei, Ordner, Codec …", focus: $searchFocused)
-                        .frame(width: 250)
-                    viewModePicker
-                    sortMenu
-                    filterButton
-                    Button { model.showAddLocationPanel() } label: { Image(systemName: "plus") }
-                        .buttonStyle(GlassIconButtonStyle(size: 32))
-                        .help("Speicherort hinzufügen (⌘O)")
-                }
+        ViewThatFits(in: .horizontal) {
+            PageHeader(title: title, subtitle: subtitle) { toolbar(searchWidth: 250) }
+                .frame(minWidth: 900)
+            VStack(alignment: .leading, spacing: 12) {
+                PageHeader(title: title, subtitle: subtitle)
+                toolbar(searchWidth: 210)
+            }
+        }
+    }
+
+    private func toolbar(searchWidth: CGFloat) -> some View {
+        GlassGroup(spacing: 8) {
+            HStack(spacing: 8) {
+                GlassSearchField(text: $model.searchText, prompt: "Titel, Datei, Ordner, Codec …", focus: $searchFocused)
+                    .frame(width: searchWidth)
+                viewModePicker
+                sortMenu
+                filterButton
+                Button { model.showAddLocationPanel() } label: { Image(systemName: "plus") }
+                    .buttonStyle(GlassIconButtonStyle(size: 32))
+                    .help("Speicherort hinzufügen (⌘O)")
             }
         }
     }

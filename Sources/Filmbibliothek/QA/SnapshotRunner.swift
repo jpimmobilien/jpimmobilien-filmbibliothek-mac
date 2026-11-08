@@ -136,7 +136,54 @@ enum SnapshotRunner {
                 if shot.window == .settings { window.close() }
             }
         }
+        // Messlauf mit sehr vielen Dateien (echte, leere Dateien in vielen Ordnern): Durchsuchen, Suche, Ansicht
+        var benchmark: [String: String] = [:]
+        if let many = argument("--library2") {
+            settings.appearance = .dark
+            let t0 = Date()
+            model.addLocations([URL(fileURLWithPath: many, isDirectory: true)])
+            let idle = await QAScenario.waitUntilIdle(model, timeout: 900)
+            let total = Date().timeIntervalSince(t0)
+            benchmark["filme"] = String(model.films.count)
+            benchmark["durchsuchenUndAnalyseSekunden"] = String(format: "%.1f", total)
+            benchmark["fertig"] = String(idle)
+            model.navigate(.library(.all))
+            settings.viewMode = .list
+            let t1 = Date()
+            model.searchText = "Video 4321.mkv"
+            while model.visibleFilms.count > 3 && Date().timeIntervalSince(t1) < 15 {
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+            benchmark["sucheMillisekunden"] = String(format: "%.0f", Date().timeIntervalSince(t1) * 1000)
+            let t2 = Date()
+            model.searchText = ""
+            while model.visibleFilms.count < model.films.count && Date().timeIntervalSince(t2) < 15 {
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+            benchmark["alleAnzeigenMillisekunden"] = String(format: "%.0f", Date().timeIntervalSince(t2) * 1000)
+            let t3 = Date()
+            settings.sortKey = .size
+            model.scheduleRecompute()
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            while model.visibleFilms.first?.sizeBytes != model.films.map(\.sizeBytes).max() && Date().timeIntervalSince(t3) < 15 {
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+            benchmark["sortierenMillisekunden"] = String(format: "%.0f", Date().timeIntervalSince(t3) * 1000)
+            settings.sortKey = .title
+            for (name, mode) in [("11-viele-dateien-liste", AppSettings.ViewMode.list), ("12-viele-dateien-raster", AppSettings.ViewMode.compactGrid)] {
+                settings.viewMode = mode
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                if let window = findWindow(.main) {
+                    let file = out.appendingPathComponent("\(name)-dunkel.png")
+                    manifest.append(["file": file.lastPathComponent, "name": name, "method": capture(window, to: file), "appearance": "dunkel"])
+                }
+            }
+            print("[Benchmark] \(benchmark)")
+            QA.log("QA-RESULT benchmark \(benchmark)")
+        }
+
         let info: [String: Any] = [
+            "benchmark": benchmark,
             "macOS": ProcessInfo.processInfo.operatingSystemVersionString,
             "architecture": QA.architecture,
             "rosetta": QA.isTranslated,

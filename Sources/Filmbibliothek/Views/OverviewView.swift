@@ -296,11 +296,13 @@ struct HeroCard: View {
                     .buttonStyle(CapsuleButtonStyle(role: .primary))
                     Button { model.navigate(.detail(film.id)) } label: { Label("Details", systemImage: "info.circle") }
                         .buttonStyle(CapsuleButtonStyle(role: .glass))
-                        .environment(\.palette, Palette.darkPalette)
                 }
                 .padding(.top, 4)
             }
             .padding(28)
+            // Text und Glasknöpfe liegen auf dem dunklen Bild – immer im dunklen Erscheinungsbild zeichnen
+            .environment(\.colorScheme, .dark)
+            .environment(\.palette, Palette.darkPalette)
         }
         .frame(height: 340)
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))

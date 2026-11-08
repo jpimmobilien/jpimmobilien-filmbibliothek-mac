@@ -14,12 +14,25 @@ BIN="$APP/Contents/MacOS/Filmbibliothek"
 test -x "$BIN" || { echo "Programmdatei fehlt: $BIN"; exit 1; }
 WORK="$(mktemp -d)"
 cp -R "$ROOT/Tests/Fixtures/Videos" "$WORK/Filme"
+EXTRA=()
+if [ -n "${SNAPSHOT_MANY:-}" ]; then
+    # Echte (leere) Dateien in vielen Ordnern für den Messlauf
+    python3 - "$WORK/Viele Testdateien" "$SNAPSHOT_MANY" <<'PY'
+import os, sys
+root, n = sys.argv[1], int(sys.argv[2])
+for i in range(n):
+    d = os.path.join(root, f"Ordner {i // 50:03d}")
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, f"Video {i}.mkv"), "wb").close()
+PY
+    EXTRA=(--library2 "$WORK/Viele Testdateien")
+fi
 RUNNER=()
 [ -n "${SNAPSHOT_ARCH:-}" ] && RUNNER=(arch "-$SNAPSHOT_ARCH")
 echo "▸ Vorschaubilder → $OUT ($(uname -m), App-Architektur ${SNAPSHOT_ARCH:-nativ})"
 set +e
 FB_DATA_DIR="$WORK/daten" FB_QA=1 perl -e 'alarm shift; exec @ARGV' "${SNAPSHOT_TIMEOUT:-1200}" ${RUNNER[@]+"${RUNNER[@]}"} "$BIN" \
-    --snapshot "$OUT" --library "$WORK/Filme" > "$OUT/protokoll.txt" 2>&1
+    --snapshot "$OUT" --library "$WORK/Filme" ${EXTRA[@]+"${EXTRA[@]}"} > "$OUT/protokoll.txt" 2>&1
 STATUS=$?
 set -e
 tail -n 60 "$OUT/protokoll.txt"
