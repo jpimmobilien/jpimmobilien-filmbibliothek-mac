@@ -67,10 +67,13 @@ public enum LocationResolver {
         public var names: Set<String>
         /// Volume-UUIDs aller eingebundenen Laufwerke (auch versteckte wie /System/Volumes/Data)
         public var uuids: Set<String>
-        public init(keys: Set<String>, names: Set<String>, uuids: Set<String> = []) {
+        /// Einhängepunkte aller Laufwerke außer „/“ (z. B. „/Volumes/Filme“)
+        public var mountPaths: Set<String>
+        public init(keys: Set<String>, names: Set<String>, uuids: Set<String> = [], mountPaths: Set<String> = []) {
             self.keys = keys
             self.names = names
             self.uuids = uuids
+            self.mountPaths = mountPaths
         }
 
         public static func current() -> Mounted {
@@ -80,11 +83,14 @@ public enum LocationResolver {
             let volumes = urls.compactMap { VolumeInspector.info(volumeURL: $0) }
             var names = Set(volumes.map(\.name))
             var uuids = Set<String>()
+            var paths = Set<String>()
             for u in urls {
                 names.insert(u.lastPathComponent)
                 if let id = (try? u.resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString { uuids.insert(id.uppercased()) }
+                let path = u.standardizedFileURL.path
+                if path != "/" && !path.isEmpty { paths.insert(path) }
             }
-            return Mounted(keys: Set(volumes.map(\.key)), names: names, uuids: uuids)
+            return Mounted(keys: Set(volumes.map(\.key)), names: names, uuids: uuids, mountPaths: paths)
         }
 
         func contains(_ l: StorageLocation) -> Bool {
@@ -92,6 +98,9 @@ public enum LocationResolver {
             if keys.contains(l.volumeKey) || (!l.volumeName.isEmpty && names.contains(l.volumeName)) { return true }
             // Laufwerkskennung aus dem Lesezeichen (bleibt gleich, auch wenn sich Name oder gespeicherte Kennung unterscheiden)
             if let data = l.bookmark, let id = SecurityScope.volumeUUID(inBookmark: data), uuids.contains(id.uppercased()) { return true }
+            // Zuletzt bekannter Pfad liegt auf einem eingebundenen Laufwerk (z. B. Netzfreigabe ohne Volume-UUID)
+            let last = l.lastKnownPath
+            if !last.isEmpty, mountPaths.contains(where: { last == $0 || last.hasPrefix($0 + "/") }) { return true }
             return false
         }
     }

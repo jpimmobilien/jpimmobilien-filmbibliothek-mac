@@ -10,7 +10,7 @@ enum Chrome {
     /// Oberkante der Inhalte unter der Navigation
     static let contentTop: CGFloat = topPadding + NavBar.height + 16
     /// Höhe des Mini-Players
-    static let miniPlayerHeight: CGFloat = 92
+    static let miniPlayerHeight: CGFloat = 164
     static func contentBottom(miniPlayer: Bool) -> CGFloat { miniPlayer ? miniPlayerHeight + 36 : 28 }
 }
 
@@ -53,7 +53,7 @@ struct MainView: View {
                 VStack(spacing: 10) {
                     Spacer(minLength: 0)
                     if let c = model.playerController {
-                        MiniPlayerBar(controller: c)
+                        MiniPlayerBar(controller: c, width: min(1040, geo.size.width - 36))
                             .frame(maxWidth: 1040)
                             .padding(.horizontal, 18)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
