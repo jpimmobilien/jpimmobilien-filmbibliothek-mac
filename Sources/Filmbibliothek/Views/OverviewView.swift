@@ -287,6 +287,8 @@ struct HeroCard: View {
             .frame(maxWidth: .infinity)
             .frame(height: height)
             .clipped()
+            // Ohne Weichzeichner (eingeschränkte Grafik) das Bild stärker abdunkeln, damit die Schrift ruhig lesbar bleibt
+            if RenderSafety.reducedEffects { Color.black.opacity(0.45) }
             LinearGradient(colors: [Color.black.opacity(0.72), Color.black.opacity(0.35), Color.black.opacity(0.15)], startPoint: .leading, endPoint: .trailing)
             RadialGradient(colors: [(tint ?? p.accent).opacity(0.35), .clear], center: UnitPoint(x: 0.82, y: 0.5), startRadius: 0, endRadius: 360)
                 .blendMode(.plusLighter)
