@@ -96,6 +96,9 @@ public enum LocationResolver {
         }
     }
 
+    /// Läuft die App in der App-Sandbox?
+    static let isSandboxed = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+
     /// Prüft einen Speicherort. Bindet NIE selbst Netzlaufwerke ein und zeigt keine Dialoge.
     public static func resolve(_ location: StorageLocation, mounted: Mounted) -> LocationResolution {
         guard let bookmark = location.bookmark else {
@@ -108,7 +111,13 @@ public enum LocationResolver {
             let exists = FileManager.default.fileExists(atPath: r.url.path, isDirectory: &isDir)
             guard exists, isDir.boolValue else {
                 access.stop()
-                return mounted.contains(location) ? .folderMissing : .offline
+                guard mounted.contains(location) else { return .offline }
+                // In der Sandbox ohne bestätigten Zugriff ist der Ordner unsichtbar – das ist eine abgelaufene
+                // Freigabe, kein fehlender Ordner.
+                if isSandboxed && !access.isSandboxGrant {
+                    return .noAccess("Die gespeicherte Freigabe gilt nicht mehr – z. B. nach einer neuen App-Version.")
+                }
+                return .folderMissing
             }
             // Lesbar? (Sandbox: ohne gültigen Zugriff schlägt das Auflisten fehl)
             do {

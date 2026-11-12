@@ -250,7 +250,7 @@ struct VolumeSlider: View {
             Button { muted.toggle() } label: {
                 Image(systemName: muted || volume == 0 ? "speaker.slash.fill" : (volume < 0.5 ? "speaker.wave.1.fill" : "speaker.wave.2.fill"))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(onDark ? .white.opacity(0.85) : p.textSecondary)
+                    .foregroundColor(onDark ? Color.white.opacity(0.85) : p.textSecondary)
                     .frame(width: 18)
             }
             .buttonStyle(PressScaleStyle(scale: 0.85))
