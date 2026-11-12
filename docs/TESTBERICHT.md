@@ -1,6 +1,6 @@
-# Testbericht – Filmbibliothek für macOS 1.0.0
+# Testbericht – Filmbibliothek für macOS 1.1.0
 
-Stand: GitHub-Actions-Lauf 9 vom 08.11.2026 (Commit `80ed2ce`), alle drei Jobs grün.
+Stand: GitHub-Actions-Lauf 19 vom 13.11.2026 (Commit `38bbd4e`).
 Alle Prüfungen laufen automatisch auf **virtuellen Macs von GitHub**. Es wurde **nichts von Hand auf einem echten
 Mac bedient** – siehe „Nicht geprüft“.
 
@@ -8,22 +8,22 @@ Mac bedient** – siehe „Nicht geprüft“.
 
 | Umgebung | Prozessor | Was dort lief |
 |---|---|---|
-| macOS 26.7.2, Xcode 26 | Apple Silicon (VM) | Build, 69 Tests, Sandbox-Ablauf, Vorschaubilder mit echtem Liquid Glass und mit Nachbildung, Messlauf 5.022 Dateien, Xcode-Projekt-Build, DMG |
-| macOS 15.8.2 | Apple Silicon (VM) | App aus der DMG installiert, Sandbox-Ablauf, Vorschaubilder (Nachbildung) |
-| macOS 15.8.2 über Rosetta 2 | x86_64-Code auf Apple Silicon | derselbe Sandbox-Ablauf und Vorschaubilder mit dem Intel-Teil der App |
-| macOS 15 | Intel x86_64 (VM) | 69 Tests nativ auf Intel (Scanner, Datenbank, Laufwerke, AVFoundation, VLCKit) |
+| macOS 26.7.2, Xcode 26.6 | Apple Silicon (VM) | Build, 69 Tests, Sandbox-Ablauf, 36 Vorschaubilder mit echtem Liquid Glass + 34 mit Nachbildung, Messlauf 5.022 Dateien, Xcode-Projekt-Build, DMG – **bestanden** |
+| macOS 15, Xcode 26.3 | Intel x86_64 (VM) | App kompiliert, 69 Tests nativ in x86_64 |
+| macOS 15 Apple Silicon und Rosetta | – | **In 1.1 nicht gelaufen:** GitHub hatte über Stunden keine Apple-Silicon-Rechner frei („capacity constraints“). In 1.0 bestanden. |
+
+Hinweis: Auf den virtuellen Macs von GitHub ist „Bewegung reduzieren“ eingeschaltet. Die Vorschaubilder zeigen deshalb
+die ruhige Variante (ohne Neigung und Lichtreflex) – genau die Darstellung, die auch Nutzer mit dieser Einstellung sehen.
 
 ## Ergebnisse
 
-**Architekturen** (geprüft mit `lipo`): App-Programmdatei `x86_64 arm64`, VLCKit.framework `x86_64 arm64`.
-Mindest-macOS im Programm: 13.0.
+**Architekturen** (`lipo`): App `x86_64 arm64`, VLCKit.framework `x86_64 arm64`; Mindest-macOS 13.0, SDK macOS 26.5.
 
-**Paket**: ad-hoc signiert (`codesign`: Signature=adhoc), Berechtigungen nur `app-sandbox`,
-`files.user-selected.read-only`, `files.bookmarks.app-scope`. Gatekeeper (`spctl`) lehnt ab – erwartbar ohne
-Developer ID. DMG: 37 MB, `hdiutil verify` gültig, enthält App, Verknüpfung „Applications“ und
-„Installation – bitte lesen.txt“. SHA-256 siehe `.sha256`-Datei.
+**Paket**: ad-hoc signiert (`Signature=adhoc`), Berechtigungen nur `app-sandbox`, `files.user-selected.read-only`,
+`files.bookmarks.app-scope`. Gatekeeper (`spctl`) lehnt ab – erwartbar ohne Developer ID. DMG 38 MB,
+`hdiutil verify` gültig. SHA-256 siehe `.sha256`-Datei.
 
-**Automatische Tests (69, alle bestanden auf Apple Silicon und auf Intel)**
+**Automatische Tests (69)** – auf Apple Silicon (macOS 26) alle bestanden; auf Intel (x86_64 nativ) in den Läufen 14–18 alle bestanden, in Lauf 19 einer mit einem Aushäng-Fehler der Test-VM (siehe „Befunde“)
 - Kernlogik: Titelbereinigung, Formate, Pfade, Suche (UND, Ausschluss, Anführungszeichen, Unicode), Filter,
   Sortierung, Fortsetzen-Regeln, Warteschlange/Zufall, Abgleich beim Durchsuchen (neu, geändert, umbenannt,
   verschoben, fehlend, wieder da, unlesbarer Ordner), Laufwerkskennung, Poster/Untertitel, Signaturerkennung.
@@ -44,35 +44,42 @@ Developer ID. DMG: 37 MB, `hdiutil verify` gültig, enthält App, Verknüpfung �
 - Auswerfen während der Wiedergabe: VLCKit meldet „Die Datei ist nicht mehr erreichbar …“; AVFoundation spielt
   eine kleine, vollständig gepufferte Datei weiter (kein Absturz); erneutes Öffnen scheitert bei beiden sauber.
 
-**Sandbox-Ablauf mit der echten App (macOS 26, macOS 15, Rosetta – jeweils bestanden)**
-1. Start mit Ordner auf einem eingebundenen Laufwerk (wie „aufs Dock-Symbol ziehen“) → läuft in der Sandbox,
-   22 Filme, Lesezeichen gespeichert (8 × AVFoundation, 11 × VLCKit, 3 × nicht abspielbar = die kaputten Testdateien).
-2. Laufwerk auswerfen → erkannt, alle 22 Filme bleiben („nicht verfügbar“).
-3. An anderem Einhängepunkt wieder einbinden → an der Volume-UUID wiedererkannt, keiner fehlt.
-4. App beenden, ohne Ordner neu starten → Zugriff über das gespeicherte Lesezeichen; AVFoundation und VLCKit spielen,
-   kaputte Datei → Meldung statt Absturz.
+**Sandbox-Ablauf mit der echten App (macOS 26, Apple Silicon – bestanden)**
+1. Start mit Ordner auf einem eingebundenen Laufwerk → läuft in der Sandbox, 22 Filme, Lesezeichen gespeichert
+   (8 × AVFoundation, 11 × VLCKit, 3 × nicht abspielbar = die kaputten Testdateien).
+2. Laufwerk auswerfen → erkannt, alle Filme bleiben („nicht verfügbar“).
+3. An anderem Einhängepunkt wieder einbinden → an der Kennung wiedererkannt, keiner fehlt.
+4. Beenden, Neustart ohne Ordner → Zugriff über das Lesezeichen; AVFoundation und VLCKit spielen, kaputte Datei → Meldung.
 
-**Messlauf 5.022 Dateien** (macOS 26, Apple Silicon): Durchsuchen + Analyse 12,1 s, Suche 0,4 s, alle anzeigen
-0,4 s, Sortieren 0,24 s. (Die 5.000 Zusatzdateien sind echte, aber leere Dateien – sie prüfen Durchsuchen und
-Oberfläche, nicht die Dekodierung.)
+**Messlauf 5.022 Dateien** (macOS 26, Apple Silicon): Durchsuchen + Analyse 11,6 s, Suche 0,3 s, alle anzeigen 0,3 s,
+Sortieren 0,14 s (die 5.000 Zusatzdateien sind leer – sie prüfen Durchsuchen und Oberfläche, nicht die Dekodierung).
 
-**Vorschaubilder**: 28 (macOS 26, Liquid Glass) bzw. 26 je weitere Umgebung, hell und dunkel, alle Ansichten
-inklusive Einstellungen und Player – alle erzeugt, keines fehlerhaft.
+**Vorschaubilder** (hell und dunkel, alle angesehen): Start mit Kinobild, Alle Filme groß/kompakt/Liste, Poster 2:3,
+Weiterschauen, Suche mit Filtern, Speicherorte, Details, kleines Fenster (960 pt), **schmales Fenster (740 pt) für Start
+und Filme**, Sammlungen, Einstellungen, Player (VLCKit und AVFoundation, pausiert), **Mini-Player** im Hauptfenster.
+Geprüft wurde dabei u. a.: Navigation frei von den Fensterknöpfen, Werkzeugleiste vollständig sichtbar, keine
+abgeschnittenen Inhalte.
 
-**Xcode-Projekt** (`xcodegen generate`): Release-Build erfolgreich, Universal (`x86_64 arm64`), Sandbox-Berechtigungen.
+**Xcode-Projekt** (`xcodegen generate`): Release-Build erfolgreich, Universal (`x86_64 arm64`).
 
-## Bekannte Befunde
-- MPEG-Transportströme (.ts/.mts/.m2ts): abspielbar, Bildgröße und Codecs bekannt, aber kein automatisches Titelbild
-  (VLCKit liefert dort kein Vorschaubild) → Titelbild nach dem ersten Abspielen.
-- Intel-VM von GitHub: Die Oberfläche lässt sich dort nicht starten – Apples Metal-Bibliothek bricht auf der
-  virtuellen Grafik („Apple Paravirtualized Graphics Device“) ab. Das betrifft die VM, nicht echte Intel-Macs mit
-  Grafikchip. Der Intel-Code der App wurde deshalb unter Rosetta mit der vollständigen Oberfläche geprüft und auf der
-  Intel-VM mit allen 69 Tests ohne Oberfläche.
+## Befunde und Korrekturen in 1.1
+- Lauf 18: Im schmalen Fenster (740 pt) war das Kinobild auf „Start“ breiter als das Fenster – Werkzeugleiste und
+  „Alle anzeigen“ wurden rechts abgeschnitten. Korrigiert in Lauf 19: Das Plakat wird kleiner bzw. ausgeblendet, die
+  Werkzeugleiste rückt bei Platzmangel unter den Titel.
+- Lauf 19, Intel-VM: Ein Laufwerkstest scheiterte beim Aufräumen („hdiutil detach … No such file or directory“ – das
+  Test-Laufwerk war schon ausgehängt). Die Prüfung selbst (Ordner gelöscht → „Ordner nicht gefunden“) war bestanden;
+  die Testhilfe wertet ein bereits ausgehängtes Laufwerk jetzt nicht mehr als Fehler.
+- MPEG-Transportströme (.ts/.mts/.m2ts): abspielbar, aber kein automatisches Titelbild (VLCKit liefert dort kein
+  Vorschaubild) → Titelbild nach dem ersten Abspielen.
+- Intel-VMs von GitHub: Die Oberfläche bricht dort in Apples Metal-Bibliothek ab („Apple Paravirtualized Graphics“) –
+  eine Grenze der VM, nicht echter Intel-Macs. Auf Intel laufen deshalb Kompilieren und alle Tests ohne Oberfläche.
 
 ## Nicht geprüft (keine echte Hardware verfügbar)
-- Bedienung von Hand (Maus, Tastatur, Ziehen aus dem Finder, Menüs, Kontextmenüs, Vollbild-Gesten).
-- Echte USB-Sticks, SD-Karten, externe SSD/HDD, NAS/SMB-Freigaben, langsame Laufwerke; Abziehen eines Steckers.
-- macOS 13 Ventura und macOS 14 Sonoma (GitHub bietet diese Systeme nicht mehr an), echte Intel-Macs.
-- Externe Bildschirme, Ruhezustand/Aufwachen, Wechsel Hell/Dunkel während des Betriebs.
-- Große echte Filmsammlungen (Tausende echte Videos), sehr große Einzeldateien, HDR, Ton über AirPlay.
-- Update auf eine spätere Version mit ad-hoc-Signatur (Zuordnung der gespeicherten Ordnerfreigaben).
+- **Das Update-Szenario des Nutzers**: vorhandene Bibliothek mit Ordnerfreigaben aus 1.0 → 1.1 installieren →
+  „Kein Zugriff“ und „Freigaben erneuern …“. Die neue Erkennung (interne SSD immer angeschlossen, Volume-UUID im
+  Lesezeichen, Einhängepunkt) ist im Code umgesetzt und im Sandbox-Ablauf mit Disk-Images mitgelaufen, der echte
+  Fall mit Freigaben einer älteren Version aber nicht.
+- Bewegungen und Hover-Effekte (Neigung, Lichtreflex, Einblenden, Herz-Puls, Linse, Übergang zur Detailseite),
+  Bedienung von Hand (Maus, Tastatur, Ziehen, Menüs, Vollbild).
+- macOS 15 auf Apple Silicon und Intel-Code unter Rosetta für 1.1 (keine Rechner frei, siehe oben); macOS 13 und 14.
+- Echte USB-Sticks, SD-Karten, externe SSD/HDD, NAS/SMB; Ruhezustand, externe Bildschirme; große echte Sammlungen.
