@@ -8,6 +8,7 @@ struct OverviewView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    @Environment(\.contentBottomInset) private var bottomInset
 
     private var heroFilm: Film? {
         let inProgress = model.films.filter { $0.playbackStatus == .inProgress && model.isAvailable($0) }
@@ -20,9 +21,16 @@ struct OverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                PageHeader(title: "Übersicht", subtitle: subtitle) {
-                    Button { model.showAddLocationPanel() } label: { Label("Speicherort hinzufügen", systemImage: "plus") }
-                        .buttonStyle(CapsuleButtonStyle(role: .primary))
+                LargeTitleHeader(title: "Start", subtitle: subtitle) {
+                    ToolCapsule {
+                        ToolButton(systemImage: "shuffle", help: "Zufälligen Film abspielen") { model.playRandom(from: model.films) }
+                            .disabled(model.films.isEmpty)
+                        ToolButton(systemImage: "arrow.clockwise", help: "Alle Speicherorte durchsuchen (⌘R)") { model.scanAll() }
+                            .disabled(model.locations.isEmpty)
+                        ToolDivider()
+                        ToolButton(systemImage: "plus", label: "Speicherort", help: "Speicherort hinzufügen (⌘O)") { model.showAddLocationPanel() }
+                        ToolButton(systemImage: "gearshape", help: "Einstellungen (⌘,)") { SettingsOpener.open() }
+                    }
                 }
                 if model.locations.isEmpty {
                     WelcomeEmptyState().frame(minHeight: 460)
@@ -40,9 +48,9 @@ struct OverviewView: View {
                     HintBar(text: "Alles bleibt auf diesem Mac. Die Filmbibliothek liest Ihre Videos nur – sie verändert, verschiebt oder löscht keine Datei, braucht kein Konto und sendet nichts ins Internet.")
                 }
             }
-            .padding(.horizontal, 30)
-            .padding(.top, 24)
-            .padding(.bottom, 36)
+            .padding(.horizontal, 32)
+            .padding(.top, 4)
+            .padding(.bottom, bottomInset + 12)
         }
     }
 
@@ -112,13 +120,16 @@ struct OverviewView: View {
                         .buttonStyle(CapsuleButtonStyle(role: .plain, compact: true))
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(alignment: .top, spacing: 18) {
-                        ForEach(films.prefix(20)) { f in
-                            FilmTile(film: f).frame(width: settings.tileShape == .widescreen ? 236 : 160)
+                    LazyHStack(alignment: .top, spacing: 20) {
+                        ForEach(Array(films.prefix(20).enumerated()), id: \.element.id) { index, f in
+                            FilmTile(film: f)
+                                .frame(width: settings.tileShape == .widescreen ? 240 : 164)
+                                .entrance(index: index)
                         }
                     }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 2)
+                    // Luft für Vergrößerung, Neigung und Lichtschein beim Darüberfahren
+                    .padding(.vertical, 16)
+                    .padding(.horizontal, 8)
                 }
             }
         }
@@ -245,70 +256,118 @@ struct FormatGroup: Identifiable {
 }
 
 /// Großes Kinobild (Vorlage: Apple-Produktseite) – zuletzt angefangener bzw. neuester Film
+/// Kinobild auf „Start“: weichgezeichneter, vergrößerter Cover-Hintergrund, großes Plakat mit Tiefe,
+/// Titel, Eckdaten, Fortschritt, Abspielen und Favorit. Färbt den Fensterhintergrund in der Coverfarbe.
 struct HeroCard: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    @Environment(\.motionFull) private var motionFull
     let film: Film
+    @State private var hover = false
+    @State private var tint: Color?
+
+    private let height: CGFloat = 330
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            CoverImage(film: film, aspect: 21.0 / 9.0, showPlaceholderTitle: false, fill: true)
-                .frame(maxWidth: .infinity)
-                .frame(height: 340)
-                .clipped()
-            LinearGradient(stops: [
-                .init(color: .clear, location: 0.25),
-                .init(color: Color.black.opacity(0.55), location: 0.7),
-                .init(color: Color.black.opacity(0.8), location: 1),
-            ], startPoint: .top, endPoint: .bottom)
-            LinearGradient(colors: [Color.black.opacity(0.55), .clear], startPoint: .leading, endPoint: .center)
-            VStack(alignment: .leading, spacing: 10) {
-                Text(film.playbackStatus == .inProgress ? "WEITERSCHAUEN" : "NEU IN DEINER BIBLIOTHEK")
-                    .font(.system(size: 11, weight: .bold)).tracking(1.4)
-                    .foregroundColor(.white.opacity(0.75))
-                Text(settings.displayTitle(film))
-                    .font(Typo.heroTitle)
-                    .foregroundColor(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.6)
-                    .safeShadow(color: .black.opacity(0.4), radius: 12)
-                HStack(spacing: 8) {
-                    ForEach(chips, id: \.self) { c in
-                        Text(c)
-                            .font(.system(size: 11.5, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.9))
-                            .padding(.horizontal, 9).padding(.vertical, 4)
-                            .glassCapsule(kind: .overlay, interactive: false)
-                    }
-                }
-                if let progress = film.progress, film.playbackStatus == .inProgress {
-                    HStack(spacing: 10) {
-                        CapsuleBar(fraction: progress, color: .white, height: 4, track: Color.white.opacity(0.25)).frame(width: 220)
-                        Text(Fmt.remaining(position: film.positionSeconds, duration: film.info.durationSeconds) ?? "")
-                            .font(.system(size: 12, weight: .medium)).foregroundColor(.white.opacity(0.8))
-                    }
-                }
-                HStack(spacing: 10) {
-                    Button { model.play(film, in: [film] + model.films.filter { $0.id != film.id && $0.playbackStatus == .inProgress }) } label: {
-                        Label(film.playbackStatus == .inProgress ? "Weiterschauen" : "Abspielen", systemImage: "play.fill")
-                    }
-                    .buttonStyle(CapsuleButtonStyle(role: .primary))
-                    Button { model.navigate(.detail(film.id)) } label: { Label("Details", systemImage: "info.circle") }
-                        .buttonStyle(CapsuleButtonStyle(role: .glass))
-                }
-                .padding(.top, 4)
+        ZStack(alignment: .leading) {
+            // Hintergrund: dasselbe Cover, groß und weich – die Fläche bekommt Farbe, ohne zu dominieren
+            CoverImage(film: film, aspect: 21.0 / 9.0, showPlaceholderTitle: false, fill: true, onColor: { c in
+                tint = c
+                model.heroTint = c
+            })
+            .scaleEffect(1.25)
+            .safeBlur(radius: 34)
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .clipped()
+            LinearGradient(colors: [Color.black.opacity(0.72), Color.black.opacity(0.35), Color.black.opacity(0.15)], startPoint: .leading, endPoint: .trailing)
+            RadialGradient(colors: [(tint ?? p.accent).opacity(0.35), .clear], center: UnitPoint(x: 0.82, y: 0.5), startRadius: 0, endRadius: 360)
+                .blendMode(.plusLighter)
+                .opacity(0.8)
+            HStack(alignment: .center, spacing: 28) {
+                info
+                Spacer(minLength: 0)
+                poster
             }
-            .padding(28)
+            .padding(.horizontal, 32)
+            .padding(.vertical, 26)
             // Text und Glasknöpfe liegen auf dem dunklen Bild – immer im dunklen Erscheinungsbild zeichnen
             .environment(\.colorScheme, .dark)
             .environment(\.palette, Palette.darkPalette)
         }
-        .frame(height: 340)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8))
-        .safeShadow(color: p.shadow, radius: 22, y: 10)
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8))
+        .safeShadow(color: (tint ?? p.accent).opacity(p.dark ? 0.22 : 0.16), radius: 30, y: 14)
+        .safeShadow(color: p.shadow, radius: 16, y: 8)
         .contextMenu { FilmContextMenu(film: film) }
+        .onHover { hover = $0 }
+    }
+
+    private var info: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(film.playbackStatus == .inProgress ? "WEITERSCHAUEN" : "NEU IN DEINER BIBLIOTHEK")
+                .font(.system(size: 11, weight: .bold)).tracking(1.4)
+                .foregroundColor(.white.opacity(0.72))
+            Text(settings.displayTitle(film))
+                .font(Typo.heroTitle)
+                .foregroundColor(.white)
+                .lineLimit(2)
+                .minimumScaleFactor(0.55)
+                .safeShadow(color: .black.opacity(0.45), radius: 14)
+            HStack(spacing: 8) {
+                ForEach(chips, id: \.self) { c in
+                    Text(c)
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.92))
+                        .padding(.horizontal, 9).padding(.vertical, 4)
+                        .glassCapsule(kind: .overlay, interactive: false)
+                }
+            }
+            if let progress = film.progress, film.playbackStatus == .inProgress {
+                HStack(spacing: 10) {
+                    ProgressStrip(fraction: progress, height: 5).frame(width: 220)
+                    Text(Fmt.remaining(position: film.positionSeconds, duration: film.info.durationSeconds) ?? "")
+                        .font(.system(size: 12, weight: .medium)).foregroundColor(.white.opacity(0.82))
+                }
+            }
+            HStack(spacing: 10) {
+                Button { model.play(film, in: [film] + model.films.filter { $0.id != film.id && $0.playbackStatus == .inProgress }) } label: {
+                    Label(film.playbackStatus == .inProgress ? "Weiterschauen" : "Abspielen", systemImage: "play.fill")
+                }
+                .buttonStyle(CapsuleButtonStyle(role: .primary))
+                Button { model.navigate(.detail(film.id)) } label: { Label("Details", systemImage: "info.circle") }
+                    .buttonStyle(CapsuleButtonStyle(role: .glass))
+                Button { model.toggleFavorite([film.id]) } label: {
+                    AnimatedHeart(isFavorite: film.isFavorite, size: 13, inactiveColor: .white)
+                        .frame(width: 34, height: 34)
+                        .glassCapsule(kind: .overlay)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(PressScaleStyle(scale: 0.9))
+                .help(film.isFavorite ? "Aus Favoriten entfernen (⌘L)" : "Zu Favoriten (⌘L)")
+            }
+            .padding(.top, 4)
+        }
+        .frame(maxWidth: 560, alignment: .leading)
+    }
+
+    /// Großes Plakat mit Tiefe; neigt sich bei voller Bewegung minimal beim Darüberfahren
+    private var poster: some View {
+        let widescreen = settings.tileShape == .widescreen
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        return CoverImage(film: film, aspect: widescreen ? 16.0 / 9.0 : 2.0 / 3.0)
+            .frame(width: widescreen ? 380 : 186)
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(Color.white.opacity(0.2), lineWidth: 0.8))
+            .overlay(LinearGradient(colors: [Color.white.opacity(0.16), .clear], startPoint: .top, endPoint: .center).clipShape(shape).allowsHitTesting(false))
+            .safeShadow(color: Color.black.opacity(0.5), radius: 22, y: 14)
+            .rotation3DEffect(.degrees(motionFull && hover ? -4 : 0), axis: (x: 0, y: 1, z: 0), perspective: 0.6)
+            .scaleEffect(motionFull && hover ? 1.02 : 1)
+            .animation(Motion.posterSpring, value: hover)
+            .onTapGesture { model.navigate(.detail(film.id)) }
+            .layoutPriority(-1)
     }
 
     private var chips: [String] {

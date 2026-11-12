@@ -83,10 +83,31 @@ enum SnapshotRunner {
             },
             Shot(name: "08-speicherorte", size: main) { m, _ in m.searchText = ""; m.filter = LibraryFilter(); m.navigate(.locations) },
             Shot(name: "10-kleines-fenster", size: CGSize(width: 960, height: 640)) { m, _ in m.navigate(.library(.all)) },
+            Shot(name: "11-sammlungen", size: main) { m, _ in
+                if m.collections.isEmpty {
+                    m.createCollection(named: "Filmabend", adding: Array(sorted.filter { $0.coverSource != CoverSource.none }.prefix(4).map(\.id)))
+                    try? await Task.sleep(nanoseconds: 400_000_000)
+                }
+                m.navigate(.collections)
+            },
+            // Schmales Fenster: Navigation nur mit Symbolen, Abstand zu den Fensterknöpfen
+            Shot(name: "13-schmales-fenster", size: CGSize(width: 740, height: 600)) { m, _ in m.navigate(.overview) },
             Shot(name: "20-einstellungen", size: CGSize(width: 860, height: 640), prepare: { _, _ in SettingsOpener.open() }, window: .settings),
         ]
         if let f = firstNative {
             shots.insert(Shot(name: "09-details", size: main) { m, _ in m.navigate(.detail(f.id)) }, at: 8)
+        }
+        if let f = firstNative {
+            // Hauptfenster mit Mini-Player unten (Player läuft)
+            shots.append(Shot(name: "32-mini-player", size: main) { m, s in
+                s.viewMode = .largeGrid
+                m.navigate(.library(.all))
+                m.play(f, in: sorted.filter { $0.playability == .native }, fromStart: true)
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                m.player.controller?.togglePlay()
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                m.player.controller?.togglePlay()
+            })
         }
         if let f = firstVLC {
             shots.append(Shot(name: "30-player-vlc", size: CGSize(width: 1280, height: 720), prepare: { m, _ in

@@ -58,10 +58,17 @@ struct PlayerView: View {
                     topBar
                     Spacer()
                     controlCapsule
+                        .onHover { controller.pointerOnControls = $0 }
                         .padding(.horizontal, 24)
                         .padding(.bottom, 22)
                 }
-                .transition(.opacity)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+            }
+
+            // Großer Wiedergabe-Knopf in der Bildmitte, solange pausiert – verschwindet beim Start weich
+            if controller.state == .paused && controller.resumePrompt == nil && controller.errorMessage == nil {
+                PlayPauseButton(isPlaying: false, size: 84, overlayStyle: true) { controller.togglePlay() }
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
 
             if let at = controller.resumePrompt { resumeCard(at) }
@@ -71,6 +78,7 @@ struct PlayerView: View {
             if case .active = phase { controller.userActivity() }
         }
         .animation(.easeOut(duration: 0.2), value: controller.seekFeedback)
+        .animation(Motion.detailCurve, value: controller.state == .paused)
         .frame(minWidth: 480, minHeight: 270)
     }
 
@@ -115,17 +123,10 @@ struct PlayerView: View {
             }
             HStack(spacing: 10) {
                 // links: Lautstärke
-                HStack(spacing: 8) {
-                    Button { controller.muted.toggle() } label: {
-                        Image(systemName: controller.muted || controller.volume == 0 ? "speaker.slash.fill" : (controller.volume < 0.5 ? "speaker.wave.1.fill" : "speaker.wave.2.fill"))
-                    }
-                    .buttonStyle(GlassIconButtonStyle(size: 30, overlay: true))
-                    .help("Ton aus/an (M)")
-                    MiniSlider(value: Binding(get: { controller.muted ? 0 : controller.volume },
-                                              set: { controller.volume = $0; if $0 > 0 { controller.muted = false } }))
-                        .frame(width: 86, height: 14)
-                }
-                .frame(width: 140, alignment: .leading)
+                VolumeSlider(volume: Binding(get: { controller.volume }, set: { controller.volume = $0 }),
+                             muted: Binding(get: { controller.muted }, set: { controller.muted = $0 }), onDark: true)
+                    .frame(width: 140, alignment: .leading)
+                    .help("Lautstärke (↑/↓), Ton aus/an (M)")
 
                 Spacer(minLength: 8)
 
@@ -138,12 +139,7 @@ struct PlayerView: View {
                         Button { controller.seek(by: -controller.seekStep) } label: { Image(systemName: "gobackward.\(Int(controller.seekStep))") }
                             .buttonStyle(GlassIconButtonStyle(size: 38, overlay: true))
                             .help("\(Int(controller.seekStep)) Sekunden zurück (←)")
-                        Button { controller.togglePlay() } label: {
-                            Image(systemName: controller.isPlaying ? "pause.fill" : "play.fill")
-                                .offset(x: controller.isPlaying ? 0 : 2)
-                        }
-                        .buttonStyle(GlassIconButtonStyle(size: 52, overlay: true))
-                        .help("Wiedergabe/Pause (Leertaste)")
+                        PlayPauseButton(isPlaying: controller.isPlaying, size: 52, overlayStyle: true) { controller.togglePlay() }
                         Button { controller.seek(by: controller.seekStep) } label: { Image(systemName: "goforward.\(Int(controller.seekStep))") }
                             .buttonStyle(GlassIconButtonStyle(size: 38, overlay: true))
                             .help("\(Int(controller.seekStep)) Sekunden vor (→)")
@@ -341,7 +337,10 @@ struct Scrubber: View {
             let fraction = d > 0 ? CGFloat(min(1, max(0, t / d))) : 0
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.18)).frame(height: hoverX != nil || controller.scrubbing != nil ? 7 : 5)
-                Capsule().fill(Color.white.opacity(0.92)).frame(width: max(5, w * fraction), height: hoverX != nil || controller.scrubbing != nil ? 7 : 5)
+                // Verlauf Akzent → Rosa mit weichem Lichtschein (dezent, gut sichtbar)
+                Capsule().fill(LinearGradient(colors: [p.accent, p.pink], startPoint: .leading, endPoint: .trailing))
+                    .frame(width: max(5, w * fraction), height: hoverX != nil || controller.scrubbing != nil ? 7 : 5)
+                    .safeShadow(color: p.accent.opacity(0.55), radius: hoverX != nil ? 8 : 4)
                 ForEach(controller.chapters.filter { $0.start > 0.5 }, id: \.self) { c in
                     if d > 0 {
                         Rectangle().fill(Color.black.opacity(0.55)).frame(width: 2, height: 7)

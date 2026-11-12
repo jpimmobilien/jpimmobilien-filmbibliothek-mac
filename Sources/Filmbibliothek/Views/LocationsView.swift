@@ -7,30 +7,33 @@ import FBServices
 struct LocationsView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.palette) private var p
+    @Environment(\.contentBottomInset) private var bottomInset
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                PageHeader(title: "Speicherorte", subtitle: subtitle) {
-                    HStack(spacing: 8) {
-                        Button { model.scanAll() } label: { Label("Alle durchsuchen", systemImage: "arrow.clockwise") }
-                            .buttonStyle(CapsuleButtonStyle(role: .glass))
+                LargeTitleHeader(title: "Speicherorte", subtitle: subtitle) {
+                    ToolCapsule {
+                        ToolButton(systemImage: "arrow.clockwise", label: "Alle durchsuchen", help: "Alle Speicherorte durchsuchen (⌘R)") { model.scanAll() }
                             .disabled(model.locations.isEmpty)
-                        Button { model.showAddLocationPanel() } label: { Label("Speicherort hinzufügen", systemImage: "plus") }
-                            .buttonStyle(CapsuleButtonStyle(role: .primary))
+                        ToolDivider()
+                        ToolButton(systemImage: "plus", label: "Hinzufügen", help: "Speicherort hinzufügen (⌘O)") { model.showAddLocationPanel() }
+                        ToolButton(systemImage: "gearshape", help: "Einstellungen (⌘,)") { SettingsOpener.open() }
                     }
                 }
                 if model.locations.isEmpty {
                     WelcomeEmptyState().frame(minHeight: 420)
                 } else {
-                    ForEach(model.locations) { loc in LocationCard(location: loc, compact: false) }
+                    ForEach(Array(model.locations.enumerated()), id: \.element.id) { index, loc in
+                        LocationCard(location: loc, compact: false).entrance(index: index)
+                    }
                 }
                 kindsCard
                 HintBar(text: "Die Filmbibliothek sieht nur Ordner, die Sie hier hinzufügen, und darf sie nur lesen (App-Sandbox). macOS merkt sich die Freigabe dauerhaft. Wird ein Laufwerk abgezogen, bleiben seine Filme mit Titelbild und Fortschritt erhalten und werden beim nächsten Anschließen an der Laufwerkskennung wiedererkannt.")
             }
-            .padding(.horizontal, 30)
-            .padding(.top, 24)
-            .padding(.bottom, 36)
+            .padding(.horizontal, 32)
+            .padding(.top, 4)
+            .padding(.bottom, bottomInset + 12)
         }
     }
 

@@ -20,8 +20,11 @@ final class PlayerCoordinator {
         if let wc = windowController { return wc }
         let wc = PlayerWindowController(controller: PlayerController(model: model)) { [weak self] in
             self?.windowController = nil
+            self?.model?.playerController = nil
+            self?.model?.playerTint = nil
         }
         windowController = wc
+        model?.playerController = wc.controller
         return wc
     }
 
@@ -49,6 +52,14 @@ final class PlayerCoordinator {
     }
 
     func togglePlay() { controller?.togglePlay() }
+
+    /// Player-Fenster nach vorn holen (Mini-Player „Player zeigen“)
+    func bringToFront() {
+        guard let w = windowController?.window else { return }
+        if w.isMiniaturized { w.deminiaturize(nil) }
+        w.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
     var isOpen: Bool { windowController != nil }
 }
 

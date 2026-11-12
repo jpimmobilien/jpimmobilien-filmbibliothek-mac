@@ -49,11 +49,11 @@ struct Palette {
 
     static let darkPalette = Palette(
         dark: true,
-        backgroundStops: [Color(rgb: 0x151C36), Color(rgb: 0x16122E), Color(rgb: 0x0E121D)],
-        glows: [Color(rgb: 0x3A3290).opacity(0.34), Color(rgb: 0x1C6274).opacity(0.30), Color(rgb: 0x52237A).opacity(0.26)],
-        panel: Color(rgb: 0x1B2037).opacity(0.78),
-        card: Color(rgb: 0x1C2138).opacity(0.72),
-        cardHover: Color(rgb: 0x232A47).opacity(0.80),
+        backgroundStops: [Color(rgb: 0x17121F), Color(rgb: 0x120F1A), Color(rgb: 0x0B0A10)],
+        glows: [Color(rgb: 0x5B2BA0).opacity(0.30), Color(rgb: 0x2A2F7A).opacity(0.26), Color(rgb: 0x7A2A6E).opacity(0.20)],
+        panel: Color(rgb: 0x1E1828).opacity(0.78),
+        card: Color(rgb: 0x1D1826).opacity(0.70),
+        cardHover: Color(rgb: 0x261F33).opacity(0.80),
         control: Color.white.opacity(0.075),
         controlHover: Color.white.opacity(0.12),
         edgeLight: Color.white.opacity(0.13),
@@ -61,11 +61,11 @@ struct Palette {
         hairline: Color.white.opacity(0.08),
         shadow: Color.black.opacity(0.45),
         textPrimary: Color.white.opacity(0.95),
-        textSecondary: Color(rgb: 0xA4A8C4),
-        textTertiary: Color(rgb: 0x737896),
-        sectionLabel: Color(rgb: 0x737896),
-        accent: Color(rgb: 0x5C8DF6),
-        accentSoft: Color(rgb: 0x5C8DF6).opacity(0.26),
+        textSecondary: Color(rgb: 0xB0A8C2),
+        textTertiary: Color(rgb: 0x7E7792),
+        sectionLabel: Color(rgb: 0x7E7792),
+        accent: Color(rgb: 0x9D74FF),
+        accentSoft: Color(rgb: 0x9D74FF).opacity(0.26),
         onAccent: .white,
         green: Color(rgb: 0x3DDC84),
         orange: Color(rgb: 0xF5A524),
@@ -79,8 +79,8 @@ struct Palette {
 
     static let lightPalette = Palette(
         dark: false,
-        backgroundStops: [Color(rgb: 0xF1F3FA), Color(rgb: 0xEAEAF6), Color(rgb: 0xE6EEF3)],
-        glows: [Color(rgb: 0x9FA8FF).opacity(0.30), Color(rgb: 0x8FD8E6).opacity(0.28), Color(rgb: 0xE2B3F2).opacity(0.24)],
+        backgroundStops: [Color(rgb: 0xF6F3FB), Color(rgb: 0xF0EBF8), Color(rgb: 0xEEEDF5)],
+        glows: [Color(rgb: 0xC3A8FF).opacity(0.32), Color(rgb: 0xA9B8FF).opacity(0.24), Color(rgb: 0xF2B8DA).opacity(0.22)],
         panel: Color.white.opacity(0.62),
         card: Color.white.opacity(0.66),
         cardHover: Color.white.opacity(0.82),
@@ -89,13 +89,13 @@ struct Palette {
         edgeLight: Color.white.opacity(0.95),
         edgeDark: Color.black.opacity(0.07),
         hairline: Color.black.opacity(0.07),
-        shadow: Color(rgb: 0x2A2F55).opacity(0.13),
-        textPrimary: Color(rgb: 0x161A2E),
-        textSecondary: Color(rgb: 0x5D627C),
-        textTertiary: Color(rgb: 0x8A8FA8),
-        sectionLabel: Color(rgb: 0x8A8FA8),
-        accent: Color(rgb: 0x2F6BEA),
-        accentSoft: Color(rgb: 0x2F6BEA).opacity(0.14),
+        shadow: Color(rgb: 0x2E1F55).opacity(0.14),
+        textPrimary: Color(rgb: 0x1A1526),
+        textSecondary: Color(rgb: 0x625A75),
+        textTertiary: Color(rgb: 0x8F88A3),
+        sectionLabel: Color(rgb: 0x8F88A3),
+        accent: Color(rgb: 0x7438E0),
+        accentSoft: Color(rgb: 0x7438E0).opacity(0.13),
         onAccent: .white,
         green: Color(rgb: 0x16A35A),
         orange: Color(rgb: 0xD9800B),
@@ -124,11 +124,13 @@ extension EnvironmentValues {
 /// Setzt die Palette passend zum aktuellen Erscheinungsbild.
 struct ThemeRoot: ViewModifier {
     @Environment(\.colorScheme) private var scheme
+    @ObservedObject private var motion = MotionPreferences.shared
 
     func body(content: Content) -> some View {
         let p = Palette.for(scheme)
         content
             .environment(\.palette, p)
+            .environment(\.motionFull, motion.full)
             .tint(p.accent)
             .foregroundColor(p.textPrimary)
     }
@@ -147,7 +149,7 @@ extension Color {
 // MARK: - Schrift
 
 enum Typo {
-    static let pageTitle = Font.system(size: 26, weight: .bold)
+    static let pageTitle = Font.system(size: 34, weight: .bold)
     static let heroTitle = Font.system(size: 50, weight: .bold)
     static let pageSubtitle = Font.system(size: 13, weight: .regular)
     static let cardTitle = Font.system(size: 13.5, weight: .semibold)
@@ -157,7 +159,7 @@ enum Typo {
     static let captionStrong = Font.system(size: 11.5, weight: .semibold)
     static let sectionLabel = Font.system(size: 10.5, weight: .semibold)
     static let bigNumber = Font.system(size: 30, weight: .semibold, design: .rounded)
-    static let tileTitle = Font.system(size: 12.5, weight: .semibold)
+    static let tileTitle = Font.system(size: 13, weight: .semibold)
     static let tileMeta = Font.system(size: 11)
 }
 

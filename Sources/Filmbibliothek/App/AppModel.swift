@@ -54,6 +54,7 @@ final class AppModel: ObservableObject {
         case overview
         case library(LibraryScope)
         case locations
+        case collections
         case detail(Int64)
     }
 
@@ -90,6 +91,13 @@ final class AppModel: ObservableObject {
     @Published var alert: AlertInfo?
     @Published var startupError: String?
     @Published var sidebarVisible = true
+    /// Laufender Player (für den Mini-Player unten) – gesetzt vom PlayerCoordinator
+    @Published var playerController: PlayerController?
+    /// Leitfarbe des laufenden Films bzw. des Kinobilds auf „Start“ – färbt den Fensterhintergrund dezent
+    @Published var playerTint: Color?
+    @Published var heroTint: Color?
+    /// Zuletzt gewählter Bereich der Navigation (Detailseiten gehören zu ihm)
+    @Published private(set) var lastSection: NavSection = .start
     @Published var locationPendingRemoval: StorageLocation?
     @Published var removeMissingRequest: RemoveMissingRequest?
     @Published var collectionNamePrompt: CollectionPrompt?
@@ -249,11 +257,20 @@ final class AppModel: ObservableObject {
     func navigate(_ r: Route) {
         guard r != route else { return }
         if case .detail = r { backStack.append(route) } else { backStack.removeAll() }
+        if case .detail = r {} else { lastSection = NavSection.of(r, fallback: lastSection) }
+        EntranceClock.shared.newWave()
         route = r
     }
 
+    /// Aktiver Bereich der Navigation oben
+    var navSection: NavSection { NavSection.of(route, fallback: lastSection) }
+
+    /// Farbe für den Fensterhintergrund: laufender Film vor Kinobild
+    var ambientTint: Color? { playerController != nil ? (playerTint ?? heroTint) : heroTint }
+
     func goBack() {
-        if let last = backStack.popLast() { route = last } else { route = .library(.all) }
+        EntranceClock.shared.newWave()
+        if let last = backStack.popLast() { route = last } else { route = lastSection.route }
     }
 
     var currentScope: LibraryScope? {
@@ -732,6 +749,16 @@ final class AppModel: ObservableObject {
     func play(_ film: Film, in list: [Film]? = nil, fromStart: Bool = false) {
         let queue = (list ?? visibleFilms).filter { isAvailable($0) && $0.playability != .unsupported }
         player.play(film: film, queue: queue.isEmpty ? [film] : queue, fromStart: fromStart)
+    }
+
+    /// Zufälligen, verfügbaren und abspielbaren Film aus einer Liste abspielen
+    func playRandom(from list: [Film]) {
+        let candidates = list.filter { isAvailable($0) && $0.playability != .unsupported }
+        guard let film = candidates.randomElement() else {
+            showToast("Kein abspielbarer Film in dieser Ansicht", systemImage: "shuffle", tone: .info)
+            return
+        }
+        play(film, in: candidates)
     }
 
     func playSelection() {

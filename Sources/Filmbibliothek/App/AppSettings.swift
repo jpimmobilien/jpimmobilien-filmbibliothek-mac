@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Metal
 import FBCore
 import FBServices
 
@@ -84,6 +85,8 @@ final class AppSettings: ObservableObject {
     @Published var subtitlesOnByDefault: Bool { didSet { save("subtitlesOnByDefault", subtitlesOnByDefault) } }
     @Published var startFullScreen: Bool { didSet { save("startFullScreen", startFullScreen) } }
     @Published var showOverviewOnLaunch: Bool { didSet { save("showOverviewOnLaunch", showOverviewOnLaunch) } }
+    /// Leichte Effekte: ohne Neigung, Lichtreflexe und gestaffeltes Einblenden (z. B. für ältere Intel-Macs)
+    @Published var lightEffects: Bool { didSet { save("lightEffects", lightEffects); MotionPreferences.shared.lightEffects = lightEffects } }
 
     init() {
         let d = UserDefaults.standard
@@ -110,6 +113,19 @@ final class AppSettings: ObservableObject {
         subtitlesOnByDefault = bool("subtitlesOnByDefault", false)
         startFullScreen = bool("startFullScreen", false)
         showOverviewOnLaunch = bool("showOverviewOnLaunch", true)
+        lightEffects = bool("lightEffects", AppSettings.defaultLightEffects)
+        MotionPreferences.shared.lightEffects = lightEffects
+    }
+
+    /// Voreinstellung: Leichte Effekte auf Intel-Macs ohne eigene Grafikkarte (integrierte Intel-Grafik),
+    /// volle Effekte auf Apple Silicon und Intel-Macs mit AMD/NVIDIA-Grafik.
+    static var defaultLightEffects: Bool {
+        #if arch(x86_64)
+        guard let name = MTLCreateSystemDefaultDevice()?.name else { return true }
+        return name.localizedCaseInsensitiveContains("intel")
+        #else
+        return false
+        #endif
     }
 
     private func save(_ key: String, _ value: Any) { defaults.set(value, forKey: key) }
@@ -135,7 +151,7 @@ final class AppSettings: ObservableObject {
     func resetToDefaults() {
         for key in ["appearance", "viewMode", "tileShape", "titleSource", "showFormatBadges", "sortKey", "sortAscending", "scanOnLaunch",
                     "scanOnMount", "heartFavorites", "coverPreference", "lastFrameAsCover", "resumeBehavior", "autoplayNext", "seekStep",
-                    "controlsHideDelay", "playerVolume", "subtitlesOnByDefault", "startFullScreen", "showOverviewOnLaunch"] {
+                    "controlsHideDelay", "playerVolume", "subtitlesOnByDefault", "startFullScreen", "showOverviewOnLaunch", "lightEffects"] {
             defaults.removeObject(forKey: key)
         }
         let fresh = AppSettings()
@@ -159,5 +175,6 @@ final class AppSettings: ObservableObject {
         subtitlesOnByDefault = fresh.subtitlesOnByDefault
         startFullScreen = fresh.startFullScreen
         showOverviewOnLaunch = fresh.showOverviewOnLaunch
+        lightEffects = fresh.lightEffects
     }
 }

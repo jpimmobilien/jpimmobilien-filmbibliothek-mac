@@ -13,6 +13,8 @@ struct CoverImage: View {
     var showPlaceholderTitle = true
     /// Füllt den vom Aufrufer vorgegebenen Rahmen (Kinobild, Hintergrund) statt ein Seitenverhältnis vorzugeben
     var fill = false
+    /// Meldet die (einmal berechnete, zwischengespeicherte) Leitfarbe des Titelbilds – für Lichtschein und Hintergrund
+    var onColor: ((Color) -> Void)? = nil
     @State private var image: NSImage?
     @State private var loadedKey: String?
 
@@ -53,8 +55,18 @@ struct CoverImage: View {
         guard film.coverSource != CoverSource.none, film.coverStamp != 0 else { image = nil; return }
         let covers = model.covers
         let id = film.id, stamp = film.coverStamp
-        let img = await Task.detached(priority: .utility) { covers.image(filmId: id, stamp: stamp) }.value
-        if !Task.isCancelled { image = img; loadedKey = key }
+        let wantsColor = onColor != nil
+        let colorKey = key
+        let (img, tint) = await Task.detached(priority: .utility) { () -> (NSImage?, NSColor?) in
+            let i = covers.image(filmId: id, stamp: stamp)
+            let c = wantsColor ? i.flatMap { CoverColors.leadingColor(of: $0, key: colorKey) } : nil
+            return (i, c)
+        }.value
+        if !Task.isCancelled {
+            image = img
+            loadedKey = key
+            if let tint { onColor?(Color(nsColor: tint)) }
+        }
     }
 }
 
@@ -65,29 +77,32 @@ struct FilmGridView: View {
     @EnvironmentObject var settings: AppSettings
     let films: [Film]
     let compact: Bool
+    /// Zusätzlicher Abstand unten (Mini-Player)
+    var bottomInset: CGFloat = 40
 
     private var minWidth: CGFloat {
         switch (settings.tileShape, compact) {
-        case (.widescreen, false): return 230
-        case (.widescreen, true): return 165
-        case (.poster, false): return 168
-        case (.poster, true): return 120
+        case (.widescreen, false): return 240
+        case (.widescreen, true): return 170
+        case (.poster, false): return 176
+        case (.poster, true): return 124
         }
     }
 
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: minWidth, maximum: minWidth * 1.6), spacing: compact ? 14 : 20)],
-                          alignment: .leading, spacing: compact ? 18 : 26) {
-                    ForEach(films) { film in
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: minWidth, maximum: minWidth * 1.6), spacing: compact ? 16 : 24)],
+                          alignment: .leading, spacing: compact ? 20 : 30) {
+                    ForEach(Array(films.enumerated()), id: \.element.id) { index, film in
                         FilmTile(film: film, compact: compact)
+                            .entrance(index: index)
                             .id(film.id)
                     }
                 }
-                .padding(.horizontal, 30)
-                .padding(.top, 6)
-                .padding(.bottom, 40)
+                .padding(.horizontal, 32)
+                .padding(.top, 10)
+                .padding(.bottom, bottomInset)
             }
             .onChange(of: model.selection) { sel in
                 if sel.count == 1, let id = sel.first { withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo(id) } }
@@ -96,55 +111,108 @@ struct FilmGridView: View {
     }
 }
 
+/// Kinoplakat-Karte: Tiefe, weicher Schatten, Lichtschein in der Coverfarbe, beim Darüberfahren minimale
+/// Vergrößerung, wandernder Lichtreflex und eine leichte Neigung zur Maus hin (nur bei voller Bewegung).
 struct FilmTile: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    @Environment(\.motionFull) private var motionFull
     let film: Film
     var compact = false
     @State private var hover = false
+    @State private var tilt = CGSize.zero
+    @State private var posterSize = CGSize(width: 1, height: 1)
+    @State private var glow: Color?
 
     private var selected: Bool { model.selection.contains(film.id) }
     private var available: Bool { model.isAvailable(film) }
+    private var radius: CGFloat { compact ? 10 : 13 }
+    /// Neu hinzugefügt (7 Tage) und noch nie abgespielt
+    private var isNew: Bool { film.lastPlayedAt == nil && film.addedAt > Date().addingTimeInterval(-7 * 86_400) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ZStack {
-                CoverImage(film: film, aspect: settings.tileShape.aspect)
-                    .saturation(available ? 1 : 0.15)
-                    .brightness(available ? 0 : -0.12)
-                overlays
-            }
-            .clipShape(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous)
-                    .strokeBorder(selected ? p.accent : Color.white.opacity(hover ? 0.28 : 0.10), lineWidth: selected ? 2.4 : 0.8)
-            )
-            .safeShadow(color: p.shadow.opacity(hover ? 1 : 0.7), radius: hover ? 16 : 9, y: hover ? 8 : 4)
-            .scaleEffect(hover ? 1.015 : 1)
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: hover)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(settings.displayTitle(film))
-                    .font(compact ? .system(size: 11.5, weight: .semibold) : Typo.tileTitle)
-                    .foregroundColor(available ? p.textPrimary : p.textSecondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                if !compact || !metaLine.isEmpty {
-                    Text(metaLine)
-                        .font(compact ? .system(size: 10.5) : Typo.tileMeta)
-                        .foregroundColor(p.textTertiary)
-                        .lineLimit(1)
-                }
-            }
-            .padding(.horizontal, 2)
+        VStack(alignment: .leading, spacing: 9) {
+            poster
+            caption
         }
         .contentShape(Rectangle())
-        .onHover { hover = $0 }
         .simultaneousGesture(TapGesture(count: 1).onEnded { select() })
         .onTapGesture(count: 2) { model.play(film) }
         .contextMenu { FilmContextMenu(film: film) }
         .help(film.fileName)
+        .zIndex(hover ? 1 : 0)
+    }
+
+    // MARK: Plakat
+
+    private var poster: some View {
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        let lifted = hover && available
+        return ZStack {
+            CoverImage(film: film, aspect: settings.tileShape.aspect, onColor: { glow = $0 })
+                .saturation(available ? 1 : 0.12)
+                .brightness(available ? 0 : -0.14)
+            // Glanzkante oben (Glas-Licht) – sehr zart
+            LinearGradient(colors: [Color.white.opacity(lifted ? 0.16 : 0.07), .clear], startPoint: .top, endPoint: .center)
+                .allowsHitTesting(false)
+            if motionFull { LightSweep(trigger: lifted, intensity: 0.20) }
+            overlays
+        }
+        .clipShape(shape)
+        .overlay(
+            shape.strokeBorder(selected ? p.accent : (p.dark ? Color.white : Color.black).opacity(lifted ? 0.24 : (p.dark ? 0.10 : 0.07)),
+                               lineWidth: selected ? 2.2 : 0.8)
+        )
+        // Lichtschein in der Coverfarbe (dezent; stärker bei Hover/Auswahl)
+        .safeShadow(color: (selected ? p.accent : (glow ?? p.accent)).opacity(selected ? 0.55 : (lifted ? (p.dark ? 0.42 : 0.30) : (p.dark ? 0.14 : 0.08))),
+                    radius: lifted || selected ? 24 : 16, y: lifted ? 12 : 8)
+        // Kontaktschatten
+        .safeShadow(color: p.shadow.opacity(lifted ? 1 : 0.75), radius: lifted ? 14 : 7, y: lifted ? 9 : 4)
+        .rotation3DEffect(.degrees(motionFull && lifted ? Double(-tilt.height) * 4.5 : 0), axis: (x: 1, y: 0, z: 0), perspective: 0.55)
+        .rotation3DEffect(.degrees(motionFull && lifted ? Double(tilt.width) * 4.5 : 0), axis: (x: 0, y: 1, z: 0), perspective: 0.55)
+        .scaleEffect(lifted ? (motionFull ? 1.035 : 1.015) : 1)
+        .background(GeometryReader { g in
+            Color.clear
+                .onAppear { posterSize = g.size }
+                .onChange(of: g.size) { posterSize = $0 }
+        })
+        .onContinuousHover { phase in
+            switch phase {
+            case .active(let pt):
+                if !hover { withAnimation(Motion.posterSpring) { hover = true } }
+                guard motionFull else { return }
+                let nx = max(-1, min(1, (pt.x / max(1, posterSize.width)) * 2 - 1))
+                let ny = max(-1, min(1, (pt.y / max(1, posterSize.height)) * 2 - 1))
+                withAnimation(.interactiveSpring(response: 0.22, dampingFraction: 0.9)) { tilt = CGSize(width: nx, height: ny) }
+            case .ended:
+                withAnimation(Motion.posterSpring) {
+                    hover = false
+                    tilt = .zero
+                }
+            }
+        }
+    }
+
+    // MARK: Beschriftung
+
+    private var caption: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(settings.displayTitle(film))
+                .font(compact ? .system(size: 11.5, weight: .semibold) : Typo.tileTitle)
+                .foregroundColor(available ? p.textPrimary : p.textSecondary)
+                .lineLimit(compact ? 1 : 2)
+                .multilineTextAlignment(.leading)
+            if !compact || !metaLine.isEmpty {
+                Text(metaLine)
+                    .font(compact ? .system(size: 10.5) : Typo.tileMeta)
+                    .foregroundColor(p.textTertiary)
+                    .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 2)
+        .offset(y: hover && available && motionFull ? 3 : 0)
+        .animation(Motion.posterSpring, value: hover)
     }
 
     private var metaLine: String {
@@ -170,20 +238,46 @@ struct FilmTile: View {
         }
     }
 
+    // MARK: Auflagen
+
     @ViewBuilder
     private var overlays: some View {
+        let lifted = hover && available
         ZStack {
-            // Oben: Format, Herz, gesehen
+            // Unten: weicher Schleier mit Abspielen und Eckdaten – nur beim Darüberfahren
+            if lifted {
+                LinearGradient(colors: [.clear, Color.black.opacity(0.62)], startPoint: .center, endPoint: .bottom)
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+                VStack {
+                    Spacer()
+                    HStack(spacing: 7) {
+                        Button { model.play(film) } label: {
+                            Image(systemName: "play.fill").offset(x: 1)
+                        }
+                        .buttonStyle(GlassIconButtonStyle(size: compact ? 28 : 34, overlay: true))
+                        .help("Abspielen")
+                        if !compact, let d = film.info.durationSeconds {
+                            Text(film.progress != nil && !film.finished ? (Fmt.remaining(position: film.positionSeconds, duration: d) ?? Fmt.runtime(d)) : Fmt.runtime(d))
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.92))
+                                .lineLimit(1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 9)
+                    .padding(.bottom, film.progress != nil && !film.finished ? 15 : 9)
+                }
+                .transition(.opacity.combined(with: .offset(y: 6)))
+            }
+            // Oben: Format, Neu, Herz, gesehen
             VStack {
                 HStack(spacing: 5) {
                     if settings.showFormatBadges {
-                        Text(film.fileExtension.uppercased())
-                            .font(.system(size: 9, weight: .bold))
-                            .tracking(0.5)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 6).padding(.vertical, 3)
-                            .background(Capsule().fill(Color.black.opacity(0.45)))
-                            .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
+                        badge(film.fileExtension.uppercased(), fill: Color.black.opacity(0.46))
+                    }
+                    if isNew && available && !compact {
+                        badge("NEU", fill: p.accent.opacity(0.92))
                     }
                     if film.playability == .unsupported {
                         Image(systemName: "exclamationmark.triangle.fill")
@@ -202,42 +296,74 @@ struct FilmTile: View {
                             .background(Circle().fill(p.green.opacity(0.9)))
                             .help("Gesehen")
                     }
-                    if film.isFavorite {
-                        Image(systemName: "heart.fill")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(p.heart)
-                            .frame(width: 20, height: 20)
-                            .background(Circle().fill(Color.black.opacity(0.45)))
+                    if film.isFavorite || lifted {
+                        Button { model.toggleFavorite([film.id]) } label: {
+                            AnimatedHeart(isFavorite: film.isFavorite, size: 10, inactiveColor: .white)
+                                .background(Circle().fill(Color.black.opacity(0.42)).frame(width: 20, height: 20))
+                                .frame(width: 20, height: 20)
+                                .contentShape(Circle())
+                        }
+                        .buttonStyle(PressScaleStyle(scale: 0.85))
+                        .help(film.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten")
+                        .transition(.opacity)
                     }
                 }
                 .padding(7)
                 Spacer()
             }
-            // Mitte: nicht verfügbar / Abspielen beim Darüberfahren
             if !available {
                 Text(film.isMissing ? "Datei fehlt" : "Nicht verfügbar")
                     .font(.system(size: 10.5, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 10).padding(.vertical, 5)
                     .glassCapsule(kind: .overlay, interactive: false)
-            } else if hover {
-                Button { model.play(film) } label: {
-                    Image(systemName: "play.fill").offset(x: 1.5)
-                }
-                .buttonStyle(GlassIconButtonStyle(size: compact ? 34 : 44, overlay: true))
-                .transition(.scale(scale: 0.8).combined(with: .opacity))
             }
-            // Unten: Fortschritt
+            // Unten: Fortschritt (Verlauf, gut sichtbar)
             if let progress = film.progress, !film.finished {
                 VStack {
                     Spacer()
-                    CapsuleBar(fraction: progress, color: p.accent, height: 4, track: Color.black.opacity(0.45))
+                    ProgressStrip(fraction: progress)
                         .padding(.horizontal, 8)
                         .padding(.bottom, 7)
                 }
             }
         }
-        .animation(.easeOut(duration: 0.15), value: hover)
+        .animation(Motion.posterSpring, value: hover)
+    }
+
+    private func badge(_ text: String, fill: Color) -> some View {
+        Text(text)
+            .font(.system(size: 9, weight: .bold))
+            .tracking(0.5)
+            .foregroundColor(.white)
+            .padding(.horizontal, 6).padding(.vertical, 3)
+            .background(Capsule().fill(fill))
+            .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
+    }
+}
+
+/// Fortschritt eines Films: dünne Spur mit Verlauf (Akzent → Violett-Rosa) und weichem Lichtpunkt am Ende.
+struct ProgressStrip: View {
+    @Environment(\.palette) private var p
+    let fraction: Double
+    var height: CGFloat = 4
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = max(0, min(1, fraction)) * geo.size.width
+            ZStack(alignment: .leading) {
+                Capsule().fill(Color.black.opacity(0.45))
+                Capsule()
+                    .fill(LinearGradient(colors: [p.accent, p.pink.opacity(0.95)], startPoint: .leading, endPoint: .trailing))
+                    .frame(width: max(height, w))
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: height + 2, height: height + 2)
+                    .safeShadow(color: p.pink.opacity(0.8), radius: 4)
+                    .offset(x: max(0, w - height - 1))
+            }
+        }
+        .frame(height: height)
     }
 }
 
@@ -247,6 +373,7 @@ struct FilmListView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    @Environment(\.contentBottomInset) private var bottomInset
     let films: [Film]
 
     var body: some View {
@@ -263,7 +390,7 @@ struct FilmListView: View {
             .padding(.vertical, 6)
             .glassCard()
             .padding(.horizontal, 30)
-            .padding(.bottom, 40)
+            .padding(.bottom, bottomInset + 12)
         }
     }
 

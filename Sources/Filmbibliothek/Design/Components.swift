@@ -330,31 +330,40 @@ struct GlassSearchField: View {
     @Binding var text: String
     var prompt = "Suchen"
     var focus: FocusState<Bool>.Binding
+    /// Breites Suchfeld im Seitenkopf (Musikbibliothek-Stil)
+    var large = false
     @State private var hover = false
 
     var body: some View {
-        HStack(spacing: 7) {
+        let focused = focus.wrappedValue
+        let shape = RoundedRectangle(cornerRadius: large ? 11 : 18, style: .continuous)
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(p.textSecondary)
+                .font(.system(size: large ? 13 : 12, weight: .semibold))
+                .foregroundColor(focused ? p.accent : p.textSecondary)
             TextField(prompt, text: $text)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13))
+                .font(.system(size: large ? 14 : 13))
                 .focused(focus)
                 .frame(minWidth: 120)
             if !text.isEmpty {
                 Button { text = "" } label: {
-                    Image(systemName: "xmark.circle.fill").font(.system(size: 12)).foregroundColor(p.textTertiary)
+                    Image(systemName: "xmark.circle.fill").font(.system(size: 13)).foregroundColor(p.textTertiary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressScaleStyle(scale: 0.85))
                 .help("Suche leeren")
+                .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 7)
-        .glassCapsule(hovered: hover || focus.wrappedValue)
-        .overlay(Capsule().strokeBorder(focus.wrappedValue ? p.accent.opacity(0.7) : .clear, lineWidth: 1.2))
+        .padding(.horizontal, large ? 14 : 12)
+        .frame(height: large ? 38 : 32)
+        .glass(shape, kind: .control, hovered: hover || focused)
+        // Fokus: klare Kante und weicher Lichtschein im Akzent
+        .overlay(shape.strokeBorder(p.accent.opacity(focused ? 0.75 : 0), lineWidth: 1.3))
+        .safeShadow(color: p.accent.opacity(focused ? 0.28 : 0), radius: 10)
         .onHover { hover = $0 }
+        .animation(Motion.hoverCurve, value: focused)
+        .animation(Motion.hoverCurve, value: text.isEmpty)
     }
 }
 

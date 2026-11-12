@@ -4,29 +4,67 @@ import UniformTypeIdentifiers
 import FBCore
 import FBServices
 
-/// Hauptfenster: Ambient-Hintergrund, schwebende Glas-Seitenleiste, Inhalt.
+/// Abstände der schwebenden Leisten (Inhalte beginnen darunter und laufen weich darunter aus).
+enum Chrome {
+    static let topPadding: CGFloat = 10
+    /// Oberkante der Inhalte unter der Navigation
+    static let contentTop: CGFloat = topPadding + NavBar.height + 16
+    /// Höhe des Mini-Players
+    static let miniPlayerHeight: CGFloat = 92
+    static func contentBottom(miniPlayer: Bool) -> CGFloat { miniPlayer ? miniPlayerHeight + 36 : 28 }
+}
+
+/// Hauptfenster (Aufbau wie die Musikbibliothek): Hintergrund in der Farbe des aktuellen Films, schwebende
+/// Glas-Navigation oben, Inhalt darunter, Mini-Player-Kapsel unten, solange ein Film läuft.
 struct MainView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    /// Start: Inhalt blendet einmal weich ein (kein Dauereffekt)
+    @State private var launched = false
 
     var body: some View {
-        ZStack {
-            AmbientBackground(accentGlow: nil)
-            HStack(spacing: 0) {
-                if model.sidebarVisible {
-                    SidebarView()
-                        .frame(width: 244)
-                        .padding(.leading, 10)
-                        .padding(.vertical, 10)
-                        .transition(.move(edge: .leading).combined(with: .opacity))
-                }
+        GeometryReader { geo in
+            let showMini = model.playerController != nil
+            ZStack(alignment: .top) {
+                AmbientBackground(accentGlow: model.ambientTint)
                 content
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.top, Chrome.contentTop)
+                    .opacity(launched ? 1 : 0)
+                    .onAppear { withAnimation(.easeOut(duration: 0.5).delay(0.05)) { launched = true } }
+                    .environment(\.contentBottomInset, Chrome.contentBottom(miniPlayer: showMini))
+
+                // Inhalte laufen weich unter die Navigation
+                EdgeFade(top: true)
+                    .frame(height: Chrome.contentTop + 4)
+                    .allowsHitTesting(false)
+                NavBar(availableWidth: geo.size.width)
+                    .padding(.top, Chrome.topPadding)
+                ScanBanner()
+                    .padding(.top, Chrome.contentTop - 8)
+
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    EdgeFade(top: false)
+                        .frame(height: showMini ? Chrome.miniPlayerHeight + 50 : 30)
+                        .allowsHitTesting(false)
+                }
+                VStack(spacing: 10) {
+                    Spacer(minLength: 0)
+                    if let c = model.playerController {
+                        MiniPlayerBar(controller: c)
+                            .frame(maxWidth: 1040)
+                            .padding(.horizontal, 18)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
+                .padding(.bottom, 14)
+                .animation(Motion.detailCurve, value: showMini)
+                if model.dropTargeted { dropOverlay }
             }
-            // Seitenleiste und Inhalt reichen bis zur Fensteroberkante (Fensterknöpfe liegen auf der Glasleiste)
+            // Bis an die Fensteroberkante (die Fensterknöpfe liegen frei links oben)
             .ignoresSafeArea(.container, edges: .top)
-            if model.dropTargeted { dropOverlay }
         }
         .overlay(alignment: .bottom) { toastView }
         .background(WindowConfigurator())
@@ -80,6 +118,8 @@ struct MainView: View {
         switch model.route {
         case .overview:
             OverviewView()
+        case .collections:
+            CollectionsView()
         case .library(let scope):
             LibraryView(scope: scope)
         case .locations:
@@ -130,8 +170,7 @@ struct MainView: View {
             .padding(.vertical, 11)
             .glassCapsule(kind: .card, interactive: false)
             .safeShadow(color: p.shadow, radius: 16, y: 6)
-            .padding(.bottom, 22)
-            .padding(.leading, model.sidebarVisible ? 254 : 0)
+            .padding(.bottom, model.playerController != nil ? Chrome.miniPlayerHeight + 34 : 22)
             .transition(.move(edge: .bottom).combined(with: .opacity))
             .onTapGesture { model.toast = nil }
         }
@@ -174,7 +213,7 @@ struct WindowConfigurator: NSViewRepresentable {
             w.isMovableByWindowBackground = true
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
-            w.minSize = NSSize(width: 900, height: 600)
+            w.minSize = NSSize(width: 720, height: 560)
             w.setFrameAutosaveName("Hauptfenster")
             w.tabbingMode = .disallowed
         }

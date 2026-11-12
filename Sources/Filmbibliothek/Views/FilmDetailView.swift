@@ -8,7 +8,11 @@ struct FilmDetailView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var settings: AppSettings
     @Environment(\.palette) private var p
+    @Environment(\.motionFull) private var motionFull
+    @Environment(\.contentBottomInset) private var bottomInset
     let film: Film
+    /// Einblenden: Das Plakat „wächst“ aus der Karte heraus, die Angaben folgen leicht versetzt
+    @State private var appeared = false
 
     var body: some View {
         let available = model.isAvailable(film)
@@ -29,9 +33,12 @@ struct FilmDetailView: View {
                 }
                 infoCards
             }
-            .padding(.horizontal, 30)
-            .padding(.top, 24)
-            .padding(.bottom, 36)
+            .padding(.horizontal, 32)
+            .padding(.top, 4)
+            .padding(.bottom, bottomInset + 12)
+        }
+        .onAppear {
+            withAnimation(motionFull ? Motion.detailCurve : .easeOut(duration: 0.15)) { appeared = true }
         }
     }
 
@@ -42,9 +49,13 @@ struct FilmDetailView: View {
             CoverImage(film: film, aspect: settings.tileShape.aspect)
                 .frame(width: settings.tileShape == .widescreen ? 380 : 220)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.14), lineWidth: 0.8))
-                .safeShadow(color: p.shadow, radius: 20, y: 10)
+                .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white.opacity(0.16), lineWidth: 0.8))
+                .overlay(LinearGradient(colors: [Color.white.opacity(0.14), .clear], startPoint: .top, endPoint: .center)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)).allowsHitTesting(false))
+                .safeShadow(color: Color.black.opacity(p.dark ? 0.5 : 0.22), radius: 24, y: 14)
                 .saturation(available ? 1 : 0.2)
+                .scaleEffect(appeared || !motionFull ? 1 : 0.9, anchor: .bottomLeading)
+                .opacity(appeared ? 1 : 0)
             VStack(alignment: .leading, spacing: 10) {
                 Text(model.locationName(film.locationId).uppercased() + (film.folder.isEmpty ? "" : " · " + film.folder.uppercased()))
                     .font(.system(size: 10.5, weight: .bold)).tracking(1.1)
@@ -63,9 +74,12 @@ struct FilmDetailView: View {
                     ForEach(chips, id: \.self) { c in Chip(text: c) }
                 }
                 statusLine
+                QualityMeter(film: film)
                 actions(available: available)
                     .padding(.top, 6)
             }
+            .opacity(appeared ? 1 : 0)
+            .offset(x: appeared || !motionFull ? 0 : 14)
             Spacer(minLength: 0)
         }
         .padding(22)
@@ -121,7 +135,7 @@ struct FilmDetailView: View {
                     .disabled(!available)
             }
             Button { model.toggleFavorite([film.id]) } label: {
-                Image(systemName: film.isFavorite ? "heart.fill" : "heart").foregroundColor(film.isFavorite ? p.heart : p.textPrimary)
+                AnimatedHeart(isFavorite: film.isFavorite, size: 13, inactiveColor: p.textPrimary)
             }
             .buttonStyle(GlassIconButtonStyle(size: 34))
             .help(film.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten")
@@ -198,6 +212,37 @@ struct FilmDetailView: View {
                     InfoRow(label: "Titelbild", value: film.coverSource.label)
                 }
             }
+        }
+    }
+}
+
+/// Bildqualität auf einen Blick: fünf Stufen SD · HD · Full HD · 4K · 8K, die erreichte Stufe leuchtet im Akzent.
+struct QualityMeter: View {
+    @Environment(\.palette) private var p
+    let film: Film
+
+    var body: some View {
+        if let r = film.resolutionClass {
+            HStack(spacing: 10) {
+                HStack(spacing: 3) {
+                    ForEach(ResolutionClass.allCases, id: \.self) { level in
+                        RoundedRectangle(cornerRadius: 2, style: .continuous)
+                            .fill(level <= r ? AnyShapeStyle(LinearGradient(colors: [p.accent, p.pink], startPoint: .bottom, endPoint: .top)) : AnyShapeStyle(p.control))
+                            .frame(width: 7, height: 6 + CGFloat(level.rawValue) * 3.5)
+                    }
+                }
+                .frame(height: 22, alignment: .bottom)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Bildqualität: \(r.label)")
+                        .font(Typo.captionStrong)
+                        .foregroundColor(p.textPrimary)
+                    Text([Fmt.resolution(film.info.width, film.info.height), Fmt.frameRate(film.info.frameRate), Fmt.bitRate(film.info.bitRate)]
+                            .compactMap { $0 }.joined(separator: " · "))
+                        .font(Typo.caption.monospacedDigit())
+                        .foregroundColor(p.textSecondary)
+                }
+            }
+            .help("Auflösungsklasse aus der Bildgröße der Datei")
         }
     }
 }

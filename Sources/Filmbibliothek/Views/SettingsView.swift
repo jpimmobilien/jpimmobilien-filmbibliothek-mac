@@ -112,6 +112,13 @@ struct SettingsView: View {
                 Toggle("Dateiformat auf den Kacheln zeigen", isOn: $settings.showFormatBadges)
                 Toggle("Beim Start die Übersicht zeigen", isOn: $settings.showOverviewOnLaunch)
             }
+            GlassCard(title: "Bewegung und Effekte", systemImage: "sparkles", iconColor: p.pink) {
+                Toggle("Leichte Effekte (ohne Neigung, Lichtreflexe und gestaffeltes Einblenden)", isOn: $settings.lightEffects)
+                Text(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                     ? "„Bewegung reduzieren“ ist in den Bedienungshilfen von macOS eingeschaltet – die App verzichtet deshalb auf Neigung, Morphing und Hintergrundbewegung."
+                     : "Auf Intel-Macs mit integrierter Grafik ist „Leicht“ voreingestellt. „Bewegung reduzieren“ in den Bedienungshilfen von macOS wird immer beachtet.")
+                    .font(Typo.caption).foregroundColor(p.textSecondary)
+            }
             GlassCard(title: "Liquid Glass", systemImage: "drop", iconColor: p.teal) {
                 InfoRow(label: "Darstellung", value: LiquidGlass.modeDescription)
                 Text(LiquidGlass.isAvailable

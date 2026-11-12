@@ -12,28 +12,41 @@ struct LibraryView: View {
     @FocusState private var searchFocused: Bool
     @State private var showFilters = false
 
+    @Environment(\.contentBottomInset) private var bottomInset
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-                .padding(.horizontal, 30)
-                .padding(.top, 24)
+                .padding(.horizontal, 32)
+                .padding(.top, 4)
                 .padding(.bottom, 12)
+            if let pair = scopePair {
+                HStack(spacing: 6) {
+                    ForEach(pair, id: \.self) { s in
+                        SegmentChip(title: pairTitle(s), count: model.count(in: s), selected: scope == s) { model.navigate(.library(s)) }
+                    }
+                }
+                .padding(.horizontal, 32)
+                .padding(.bottom, 10)
+            }
             if model.scopeFormats.count > 1 {
                 formatChips
-                    .padding(.horizontal, 30)
+                    .padding(.horizontal, 32)
                     .padding(.bottom, 10)
             }
             if otherFiltersActive || !model.searchText.isEmpty || folderPath != nil {
                 chipsRow
-                    .padding(.horizontal, 30)
+                    .padding(.horizontal, 32)
                     .padding(.bottom, 10)
             }
             if let banner = locationBanner {
-                banner.padding(.horizontal, 30).padding(.bottom, 12)
+                banner.padding(.horizontal, 32).padding(.bottom, 12)
             }
             contentArea
         }
         .background(KeyboardShortcutsForLibrary(searchFocused: $searchFocused))
+        .onChange(of: settings.sortKey) { _ in EntranceClock.shared.newWave() }
+        .onChange(of: settings.sortAscending) { _ in EntranceClock.shared.newWave() }
     }
 
     // MARK: - Kopf
@@ -73,30 +86,56 @@ struct LibraryView: View {
         return nil
     }
 
-    /// Breites Fenster: Titel links, Werkzeugleiste rechts. Schmales Fenster: Werkzeugleiste unter dem Titel.
+    /// Wie in der Musikbibliothek: großer Titel links, Glas-Werkzeugleiste rechts, darunter das breite Suchfeld
+    /// und die Anzahl. In schmalen Fenstern rückt die Werkzeugleiste unter den Titel.
     private var header: some View {
-        ViewThatFits(in: .horizontal) {
-            PageHeader(title: title, subtitle: subtitle) { toolbar(searchWidth: 250) }
-                .frame(minWidth: 900)
-            VStack(alignment: .leading, spacing: 12) {
-                PageHeader(title: title, subtitle: subtitle)
-                toolbar(searchWidth: 210)
+        VStack(alignment: .leading, spacing: 12) {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 16) {
+                    titleText
+                    Spacer(minLength: 12)
+                    toolbar
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    titleText
+                    toolbar
+                }
             }
+            GlassSearchField(text: $model.searchText, prompt: "Titel, Datei, Ordner, Format, Codec …", focus: $searchFocused, large: true)
+                .frame(maxWidth: 560)
+            Text(subtitle)
+                .font(.system(size: 12.5).monospacedDigit())
+                .foregroundColor(p.textSecondary)
+                .lineLimit(1)
+                .padding(.leading, 2)
         }
     }
 
-    private func toolbar(searchWidth: CGFloat) -> some View {
-        GlassGroup(spacing: 8) {
-            HStack(spacing: 8) {
-                GlassSearchField(text: $model.searchText, prompt: "Titel, Datei, Ordner, Codec …", focus: $searchFocused)
-                    .frame(width: searchWidth)
-                viewModePicker
-                sortMenu
-                filterButton
-                Button { model.showAddLocationPanel() } label: { Image(systemName: "plus") }
-                    .buttonStyle(GlassIconButtonStyle(size: 32))
-                    .help("Speicherort hinzufügen (⌘O)")
+    private var titleText: some View {
+        Text(title)
+            .font(Typo.pageTitle)
+            .foregroundColor(p.textPrimary)
+            .lineLimit(1)
+            .truncationMode(.tail)
+    }
+
+    private var toolbar: some View {
+        ToolCapsule {
+            ForEach(AppSettings.ViewMode.allCases) { mode in
+                ToolButton(systemImage: mode.symbol, selected: settings.viewMode == mode, help: "\(mode.label) (⌘\((AppSettings.ViewMode.allCases.firstIndex(of: mode) ?? 0) + 1))") {
+                    settings.viewMode = mode
+                }
             }
+            ToolDivider()
+            sortMenu
+            ToolDivider()
+            filterButton
+            ToolButton(systemImage: "shuffle", help: "Zufälligen Film aus dieser Ansicht abspielen") {
+                model.playRandom(from: model.visibleFilms)
+            }
+            .disabled(model.visibleFilms.isEmpty)
+            ToolButton(systemImage: "plus", help: "Speicherort hinzufügen (⌘O)") { model.showAddLocationPanel() }
+            ToolButton(systemImage: "gearshape", help: "Einstellungen (⌘,)") { SettingsOpener.open() }
         }
     }
 
@@ -134,18 +173,22 @@ struct LibraryView: View {
                 }
             }
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: "arrow.up.arrow.down").font(.system(size: 11, weight: .semibold))
                 Text(scope.impliedSort == nil ? settings.sortKey.label : "Automatisch").font(.system(size: 12.5, weight: .semibold))
+                if scope.impliedSort == nil {
+                    Image(systemName: settings.sortAscending ? "arrow.up" : "arrow.down")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(p.accent)
+                }
             }
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
         .tint(p.textPrimary)
-        .padding(.horizontal, 12)
-        .frame(height: 32)
-        .glassCapsule()
+        .padding(.horizontal, 8)
+        .frame(height: 30)
         .disabled(scope.impliedSort != nil)
         .help(scope.impliedSort == nil ? "Sortierung" : "Dieser Bereich ist nach Datum sortiert")
     }
@@ -163,12 +206,13 @@ struct LibraryView: View {
                         .background(Circle().fill(p.accent))
                 }
             }
-            .foregroundColor(p.textPrimary)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
-            .glassCapsule(tint: model.filter.activeCount > 0 ? p.accentSoft : nil)
+            .foregroundColor(model.filter.activeCount > 0 ? p.accent : p.textPrimary.opacity(0.85))
+            .padding(.horizontal, 10)
+            .frame(height: 30)
+            .background(RoundedRectangle(cornerRadius: 15, style: .continuous).fill(model.filter.activeCount > 0 ? p.accentSoft : .clear))
+            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleStyle(scale: 0.94))
         .popover(isPresented: $showFilters, arrowEdge: .bottom) {
             FilterPanel().environmentObject(model).filmTheme()
         }
@@ -176,6 +220,25 @@ struct LibraryView: View {
     }
 
     // MARK: - Chips
+
+    /// Zusammengehörige Bereiche als Segment („Nicht beendet | Zuletzt abgespielt“, „Alle | Nicht verfügbar“)
+    private var scopePair: [LibraryScope]? {
+        switch scope {
+        case .continueWatching, .recentlyPlayed: return [.continueWatching, .recentlyPlayed]
+        case .all, .unavailable: return model.count(in: .unavailable) > 0 ? [.all, .unavailable] : nil
+        default: return nil
+        }
+    }
+
+    private func pairTitle(_ s: LibraryScope) -> String {
+        switch s {
+        case .continueWatching: return "Nicht beendet"
+        case .recentlyPlayed: return "Zuletzt abgespielt"
+        case .all: return "Alle Filme"
+        case .unavailable: return "Nicht verfügbar"
+        default: return ""
+        }
+    }
 
     /// Filter außer dem Format aktiv? (das Format steht schon in den Segment-Chips)
     private var otherFiltersActive: Bool {
@@ -251,8 +314,8 @@ struct LibraryView: View {
             emptyForScope
         } else {
             switch settings.viewMode {
-            case .largeGrid: FilmGridView(films: model.visibleFilms, compact: false)
-            case .compactGrid: FilmGridView(films: model.visibleFilms, compact: true)
+            case .largeGrid: FilmGridView(films: model.visibleFilms, compact: false, bottomInset: bottomInset + 12)
+            case .compactGrid: FilmGridView(films: model.visibleFilms, compact: true, bottomInset: bottomInset + 12)
             case .list: FilmListView(films: model.visibleFilms)
             }
         }
@@ -295,6 +358,18 @@ struct WelcomeEmptyState: View {
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
+            // Leuchtendes App-Symbol über einem langsam laufenden Filmstreifen
+            ZStack {
+                FilmstripView(moving: true, height: 46)
+                    .frame(width: 360)
+                    .mask(LinearGradient(colors: [.clear, .black, .black, .clear], startPoint: .leading, endPoint: .trailing))
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .interpolation(.high)
+                    .frame(width: 96, height: 96)
+                    .safeShadow(color: p.accent.opacity(0.45), radius: 28, y: 10)
+            }
+            .padding(.bottom, 6)
             Text("Deine Filme.\nAlle an einem Ort.")
                 .font(.system(size: 46, weight: .bold))
                 .multilineTextAlignment(.center)

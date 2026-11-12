@@ -25,6 +25,8 @@ final class PlayerController: ObservableObject {
     @Published private(set) var subtitleText: String?
     @Published private(set) var engineName = ""
     @Published var controlsVisible = true
+    /// Maus liegt auf der Steuerung → nicht ausblenden
+    var pointerOnControls = false { didSet { if pointerOnControls { hideTask?.cancel() } else { scheduleHide() } } }
     @Published var resumePrompt: Double?
     @Published var errorMessage: String?
     @Published var seekFeedback: String?
@@ -464,7 +466,7 @@ final class PlayerController: ObservableObject {
         let delay = model?.settings.controlsHideDelay ?? 3
         hideTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-            guard !Task.isCancelled, let self, self.state == .playing, self.scrubbing == nil else { return }
+            guard !Task.isCancelled, let self, self.state == .playing, self.scrubbing == nil, !self.pointerOnControls else { return }
             withAnimation(.easeInOut(duration: 0.45)) { self.controlsVisible = false }
             NSCursor.setHiddenUntilMouseMoves(true)
         }

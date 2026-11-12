@@ -13,7 +13,7 @@ struct FilmbibliothekApp: App {
                 .environmentObject(delegate.model)
                 .environmentObject(delegate.settings)
                 .filmTheme()
-                .frame(minWidth: 900, minHeight: 600)
+                .frame(minWidth: 720, minHeight: 560)
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1360, height: 860)
@@ -93,7 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let list = self.model.visibleFilms
             guard !list.isEmpty else { return event }
             let current = self.model.selection.count == 1 ? list.firstIndex { $0.id == self.model.selection.first } : nil
-            let columns = self.model.settings.viewMode == .list ? 1 : max(1, Int((window.frame.width - 300) / (self.model.settings.viewMode == .compactGrid ? 180 : 250)))
+            let columns = self.model.settings.viewMode == .list ? 1 : max(1, Int((window.frame.width - 64) / (self.model.settings.viewMode == .compactGrid ? 186 : 264)))
             var target: Int?
             switch event.keyCode {
             case 123: target = (current ?? 1) - 1          // ←
@@ -131,21 +131,17 @@ struct AppCommands: Commands {
                 .disabled(model.locations.isEmpty)
         }
         CommandGroup(after: .sidebar) {
-            Button(model.sidebarVisible ? "Seitenleiste ausblenden" : "Seitenleiste einblenden") {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { model.sidebarVisible.toggle() }
-            }
-            .keyboardShortcut("s", modifiers: [.command, .control])
-            Divider()
             ForEach(Array(AppSettings.ViewMode.allCases.enumerated()), id: \.offset) { i, mode in
                 Button(mode.label) { settings.viewMode = mode }
                     .keyboardShortcut(KeyEquivalent(Character("\(i + 1)")), modifiers: .command)
             }
             Divider()
-            Button("Übersicht") { model.navigate(.overview) }.keyboardShortcut("1", modifiers: [.command, .shift])
-            Button("Alle Filme") { model.navigate(.library(.all)) }.keyboardShortcut("2", modifiers: [.command, .shift])
-            Button("Weiterschauen") { model.navigate(.library(.continueWatching)) }.keyboardShortcut("3", modifiers: [.command, .shift])
-            Button("Favoriten") { model.navigate(.library(.favorites)) }.keyboardShortcut("4", modifiers: [.command, .shift])
-            Button("Speicherorte") { model.navigate(.locations) }.keyboardShortcut("5", modifiers: [.command, .shift])
+            ForEach(NavSection.allCases) { section in
+                Button(section.label) { model.navigate(section.route) }
+                    .keyboardShortcut(KeyEquivalent(Character("\(section.rawValue + 1)")), modifiers: [.command, .shift])
+            }
+            Button("Zuletzt abgespielt") { model.navigate(.library(.recentlyPlayed)) }
+            Button("Nicht verfügbare Filme") { model.navigate(.library(.unavailable)) }
             Divider()
         }
         CommandMenu("Film") {
