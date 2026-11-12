@@ -491,6 +491,28 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Alle Speicherorte ohne gültige Freigabe nacheinander bestätigen lassen (je ein Auswahlfenster, auf den Ordner gerichtet)
+    func regrantAll() {
+        let pending = locations.filter { if case .noAccess = availabilityOf(location: $0.id) { return true } else { return false } }
+        guard !pending.isEmpty else { return }
+        Task { @MainActor in
+            for loc in pending {
+                let panel = NSOpenPanel()
+                panel.canChooseDirectories = true
+                panel.canChooseFiles = false
+                panel.allowsMultipleSelection = false
+                panel.prompt = "Zugriff erteilen"
+                panel.message = "Freigabe erneuern: Bitte „\(loc.name)“ auswählen (\(loc.lastKnownPath))."
+                let last = URL(fileURLWithPath: loc.lastKnownPath)
+                panel.directoryURL = last.deletingLastPathComponent()
+                let response = await withCheckedContinuation { (cont: CheckedContinuation<NSApplication.ModalResponse, Never>) in
+                    panel.begin { cont.resume(returning: $0) }
+                }
+                if response == .OK, let url = panel.url { addLocations([url]) } else { break }
+            }
+        }
+    }
+
     /// Netzlaufwerk über den Finder verbinden (Zugangsdaten aus dem Schlüsselbund)
     func reconnect(_ loc: StorageLocation) {
         guard let url = LocationResolver.reconnectURL(for: loc) else { return }

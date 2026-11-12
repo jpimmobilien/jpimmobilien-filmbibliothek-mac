@@ -65,21 +65,34 @@ public enum LocationResolver {
     public struct Mounted: Sendable {
         public var keys: Set<String>
         public var names: Set<String>
-        public init(keys: Set<String>, names: Set<String>) {
+        /// Volume-UUIDs aller eingebundenen Laufwerke (auch versteckte wie /System/Volumes/Data)
+        public var uuids: Set<String>
+        public init(keys: Set<String>, names: Set<String>, uuids: Set<String> = []) {
             self.keys = keys
             self.names = names
+            self.uuids = uuids
         }
 
         public static func current() -> Mounted {
-            let volumes = VolumeInspector.mountedVolumes()
+            // Auch versteckte Volumes: Ordner im Benutzerordner liegen auf dem Daten-Volume (/System/Volumes/Data),
+            // das macOS als „versteckt“ führt – sonst gälte die interne SSD fälschlich als „nicht angeschlossen“.
+            let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: Array(VolumeInspector.keys), options: []) ?? []
+            let volumes = urls.compactMap { VolumeInspector.info(volumeURL: $0) }
             var names = Set(volumes.map(\.name))
-            let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: [.skipHiddenVolumes]) ?? []
-            for u in urls { names.insert(u.lastPathComponent) }
-            return Mounted(keys: Set(volumes.map(\.key)), names: names)
+            var uuids = Set<String>()
+            for u in urls {
+                names.insert(u.lastPathComponent)
+                if let id = (try? u.resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString { uuids.insert(id.uppercased()) }
+            }
+            return Mounted(keys: Set(volumes.map(\.key)), names: names, uuids: uuids)
         }
 
         func contains(_ l: StorageLocation) -> Bool {
-            keys.contains(l.volumeKey) || (!l.volumeName.isEmpty && names.contains(l.volumeName))
+            if l.kind == .internalDisk { return true }   // die interne SSD ist immer da
+            if keys.contains(l.volumeKey) || (!l.volumeName.isEmpty && names.contains(l.volumeName)) { return true }
+            // Laufwerkskennung aus dem Lesezeichen (bleibt gleich, auch wenn sich Name oder gespeicherte Kennung unterscheiden)
+            if let data = l.bookmark, let id = SecurityScope.volumeUUID(inBookmark: data), uuids.contains(id.uppercased()) { return true }
+            return false
         }
     }
 
@@ -110,7 +123,9 @@ public enum LocationResolver {
         case .failure(.notFound), .failure(.volumeNotMounted):
             return mounted.contains(location) ? .folderMissing : .offline
         case .failure(.accessDenied(let message)):
-            return mounted.contains(location) ? .noAccess(message) : .offline
+            return mounted.contains(location)
+                ? .noAccess("Die gespeicherte Freigabe gilt nicht mehr – z. B. nach einer neuen App-Version (\(message))")
+                : .offline
         }
     }
 

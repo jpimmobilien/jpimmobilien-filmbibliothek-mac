@@ -81,11 +81,17 @@ struct OverviewView: View {
                             Chip(text: "Analyse: noch \(Fmt.integer(model.metadataRemaining))", dot: p.violet)
                         }
                         ForEach(unavailable.prefix(4)) { loc in
-                            Chip(text: "\(loc.name): \(model.availabilityOf(location: loc.id).label)", dot: p.textTertiary)
+                            Chip(text: "\(loc.name): \(model.availabilityOf(location: loc.id).label)",
+                                 dot: { if case .noAccess = model.availabilityOf(location: loc.id) { return p.orange } else { return p.textTertiary } }())
                         }
                     }
                 }
                 Spacer()
+                if unavailable.contains(where: { if case .noAccess = model.availabilityOf(location: $0.id) { return true } else { return false } }) {
+                    Button { model.regrantAll() } label: { Label("Freigaben erneuern …", systemImage: "lock.open") }
+                        .buttonStyle(CapsuleButtonStyle(role: .primary, compact: true))
+                        .help("Die Ordner einmal bestätigen – z. B. nach einer neuen App-Version. Bibliothek, Favoriten und Fortschritt bleiben erhalten.")
+                }
                 if !unavailable.isEmpty {
                     Button { model.navigate(.locations) } label: { Label("Warum?", systemImage: "info.circle") }
                         .buttonStyle(CapsuleButtonStyle(role: .glass, compact: true))

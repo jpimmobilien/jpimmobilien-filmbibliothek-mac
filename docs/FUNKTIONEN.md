@@ -1,4 +1,4 @@
-# Funktionsliste – Filmbibliothek für macOS 1.0
+# Funktionsliste – Filmbibliothek für macOS 1.1
 
 Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
 
@@ -30,6 +30,27 @@ Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
 - Angezeigt: Titel, Dateiname, Ordner, Speicherort, Format, Größe, Auflösung (+ Klasse SD/HD/Full HD/4K/8K), Seitenverhältnis, Bildrate, Video-/Audiocodec, Datenrate, Laufzeit, Ton-/Untertitelspuren, Kapitel, Datumsangaben, zuletzt abgespielt, Wiedergaben, Fortschritt, Engine.
 - Titelbilder: Posterdatei im Ordner, eingebettetes Cover, Bild aus dem Video, zuletzt gesehenes Bild – lokal, offline.
 - Titel aus dem Dateinamen bereinigt (z. B. Release-Kennzeichen entfernt) oder vollständiger Dateiname.
+
+## Gestaltung und Bewegung (1.1)
+- Aufbau wie die Musikbibliothek: schwebende Glas-Navigation oben mit gleitender Linse – Start · Filme · Weiterschauen ·
+  Neu · Favoriten · Sammlungen · Speicherorte (⇧⌘1–7); in schmalen Fenstern nur Symbole, immer frei von den Fensterknöpfen.
+- Seitenkopf: großer Titel, Glas-Werkzeugkapsel (Ansicht, Sortierung mit Richtung, Filter, Zufallsfilm, Speicherort, Einstellungen),
+  breites Suchfeld mit Fokus-Leuchten, Anzahl, Segment-Chips („Nicht beendet | Zuletzt abgespielt“, „Alle | Nicht verfügbar“, Formate).
+- Mini-Player unten, solange ein Film läuft: Cover, Titel, Zeitleiste mit Zeit-Vorschau und Kapitelmarken, Sprünge, Wiedergabe/Pause,
+  nächster/vorheriger Film, Glas-Lautstärke, „Player zeigen“, Beenden.
+- Fensterhintergrund in der Farbe des laufenden Films bzw. des Kinobilds (Leitfarbe lokal aus dem Titelbild berechnet, zwischengespeichert).
+- Poster-Karten: Tiefe, Kontakt- und Farbschatten, Glanzkante; beim Darüberfahren minimale Vergrößerung, wandernder Lichtreflex,
+  leichte Neigung zur Maus, Schleier mit Abspielen und Restzeit, Herz zum Favorisieren (mit Puls); „NEU“-Marke (7 Tage, nie abgespielt);
+  Fortschritt als Verlauf; gestaffeltes Einblenden nur für sichtbare Karten nach einem Wechsel.
+- Kinobild auf „Start“: weichgezeichneter Cover-Hintergrund, Plakat mit Tiefe, Eckdaten, Fortschritt, Abspielen, Details, Favorit.
+- Detailseite: Plakat wächst beim Öffnen heraus, Angaben folgen; Bildqualitäts-Anzeige (SD · HD · Full HD · 4K · 8K).
+- Player: Wiedergabe/Pause gehen ineinander über, großer Knopf bei Pause, Zeitleiste mit Verlauf und Leuchten, Glas-Lautstärke;
+  die Steuerung bleibt sichtbar, solange die Maus darauf liegt.
+- Sammlungen als eigener Bereich mit Cover-Mosaik; Durchsuchen/Analyse als Glas-Kapsel mit echten Zahlen.
+- Leerzustand mit App-Symbol über einem langsam laufenden Filmstreifen; Inhalt blendet beim Start einmal weich ein.
+- „Bewegung reduzieren“ (macOS) und „Leichte Effekte“ (Einstellungen; Voreinstellung auf Intel-Macs mit integrierter Grafik)
+  schalten Neigung, Lichtreflexe, Morphing und Staffelung ab. Keine Dauer-Animationen, keine Zeitgeber für Effekte.
+- Neues App-Symbol (violetter Ordner mit Filmstreifen), Akzentfarbe Violett, DMG-Hintergrund passend.
 
 ## Ansichten, Suche, Filter
 - Übersicht mit Kinobild, Statusleiste, Reihen (Weiterschauen, Neu hinzugefügt, Favoriten) und Karten (Bibliothek, Wiedergabe, Formate, Speicherorte).
