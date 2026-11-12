@@ -57,17 +57,24 @@ struct CoverImage: View {
         let id = film.id, stamp = film.coverStamp
         let wantsColor = onColor != nil
         let colorKey = key
-        let (img, tint) = await Task.detached(priority: .utility) { () -> (NSImage?, NSColor?) in
+        let result = await Task.detached(priority: .utility) { () -> CoverLoadResult in
             let i = covers.image(filmId: id, stamp: stamp)
             let c = wantsColor ? i.flatMap { CoverColors.leadingColor(of: $0, key: colorKey) } : nil
-            return (i, c)
+            return CoverLoadResult(image: i, tint: c)
         }.value
         if !Task.isCancelled {
-            image = img
+            image = result.image
             loadedKey = key
-            if let tint { onColor?(Color(nsColor: tint)) }
+            if let tint = result.tint { onColor?(Color(nsColor: tint)) }
         }
     }
+}
+
+/// Ergebnis des Ladens im Hintergrund. NSImage ist erst ab macOS 14 als „Sendable“ markiert; das Bild wird hier nur
+/// einmal erzeugt und danach nicht mehr verändert, die Übergabe an den Haupt-Thread ist daher sicher.
+private struct CoverLoadResult: @unchecked Sendable {
+    let image: NSImage?
+    let tint: NSColor?
 }
 
 // MARK: - Raster
