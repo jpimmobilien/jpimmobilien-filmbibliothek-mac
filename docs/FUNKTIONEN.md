@@ -4,6 +4,10 @@ Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
 
 ## Bibliothek
 - Speicherorte: Ordner oder ganze Laufwerke – interne SSD, externe SSD/HDD, USB-Sticks, SD-Karten, weitere Volumes, NAS/Netzlaufwerke (vorher im Finder verbunden).
+- Angeschlossen oder nicht (1.1): erkannt über Laufwerkskennung, Name, Volume-UUID im Lesezeichen und Einhängepunkt; die interne SSD
+  (auch das versteckte Daten-Volume) gilt immer als angeschlossen. Ist ein Laufwerk da, die gespeicherte Freigabe aber abgelaufen (z. B.
+  nach einer neuen App-Version), heißt es „Kein Zugriff“ statt „Nicht verfügbar“ – „Freigaben erneuern …“ auf „Start“ lässt alle
+  betroffenen Ordner nacheinander bestätigen; Bibliothek, Favoriten und Fortschritt bleiben erhalten.
 - Hinzufügen über „Speicherort hinzufügen …“ (⌘O, Dialog mit Mehrfachauswahl), Ziehen aus dem Finder ins Fenster, Ziehen aufs Dock-Symbol, „Öffnen mit“.
 - Dauerhafter Zugriff nach Neustart über sicherheitsgeschützte Lesezeichen (App-Sandbox, nur lesen).
 - Klare Hinweise, wenn ein Ort nicht erreichbar ist: „Laufwerk nicht angeschlossen“, „Netzlaufwerk nicht verbunden“ (mit „Verbinden“), „Kein Zugriff“ (mit „Zugriff erteilen …“), „Ordner nicht gefunden“ (mit „Neu zuordnen …“).
@@ -36,8 +40,10 @@ Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
   Neu · Favoriten · Sammlungen · Speicherorte (⇧⌘1–7); in schmalen Fenstern nur Symbole, immer frei von den Fensterknöpfen.
 - Seitenkopf: großer Titel, Glas-Werkzeugkapsel (Ansicht, Sortierung mit Richtung, Filter, Zufallsfilm, Speicherort, Einstellungen),
   breites Suchfeld mit Fokus-Leuchten, Anzahl, Segment-Chips („Nicht beendet | Zuletzt abgespielt“, „Alle | Nicht verfügbar“, Formate).
-- Mini-Player unten, solange ein Film läuft: Cover, Titel, Zeitleiste mit Zeit-Vorschau und Kapitelmarken, Sprünge, Wiedergabe/Pause,
-  nächster/vorheriger Film, Glas-Lautstärke, „Player zeigen“, Beenden.
+- Mini-Player unten, solange ein Film läuft (Aufbau wie in der Musikbibliothek): großes Titelbild, Titel, Eckdaten in der Akzentfarbe
+  (Jahr · Auflösung · Laufzeit), Speicherort/Ordner/Format/Engine und Position in der Warteschlange; Zeitleiste mit Zeit-Vorschau und
+  Kapitelmarken; darunter Lautstärke, in der Mitte Sprünge, Wiedergabe/Pause, vorheriger/nächster Film, rechts Tempo; oben Favorit,
+  Ton/Untertitel, „Player zeigen“, Beenden. In schmalen Fenstern rückt alles enger zusammen.
 - Fensterhintergrund in der Farbe des laufenden Films bzw. des Kinobilds (Leitfarbe lokal aus dem Titelbild berechnet, zwischengespeichert).
 - Poster-Karten: Tiefe, Kontakt- und Farbschatten, Glanzkante; beim Darüberfahren minimale Vergrößerung, wandernder Lichtreflex,
   leichte Neigung zur Maus, Schleier mit Abspielen und Restzeit, Herz zum Favorisieren (mit Puls); „NEU“-Marke (7 Tage, nie abgespielt);

@@ -6,8 +6,11 @@
   vorliegt. Folge: Beim ersten Start fragt macOS nach (Vorgehen siehe „Installation – bitte lesen.txt“).
 - Die Bau-Kette kann signieren und beglaubigen, sobald die Zugangsdaten als GitHub-Secrets hinterlegt sind
   (`MACOS_CERT_P12_BASE64`, `MACOS_CERT_PASSWORD`, `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD`).
-- Ohne Developer-ID kann macOS nach einem App-Update gespeicherte Ordnerfreigaben eventuell nicht mehr der neuen
-  Version zuordnen; die App zeigt dann „Kein Zugriff“ mit „Zugriff erteilen …“ (Daten bleiben erhalten).
+- Ohne feste Signatur (ad-hoc) ordnet macOS gespeicherte Ordnerfreigaben nach einem App-Update meist nicht mehr der
+  neuen Version zu. Ab 1.1 zeigt die App dann „Kein Zugriff“ (nicht mehr „Nicht verfügbar“) und auf „Start“
+  „Freigaben erneuern …“: Ordner einmal bestätigen, Bibliothek, Favoriten und Fortschritt bleiben erhalten. Dauerhaft
+  vermeiden ließe sich das mit einer gleichbleibenden Signatur (eigenes, kostenloses Zertifikat als GitHub-Secret oder
+  Developer ID).
 
 ## Formate
 - AVFoundation spielt nur Apple-Container (MP4, M4V, MOV, 3GP) mit von macOS unterstützten Codecs.
@@ -41,6 +44,10 @@
 - Echtes Liquid Glass gibt es nur auf macOS 26 (Tahoe) und nur, wenn die App mit dem macOS-26-SDK gebaut wurde (so
   in der CI). Auf macOS 13–15 ist es mit den Glasmaterialien von macOS nachgebildet.
 - Die App ist deutsch; keine weiteren Sprachen.
+- Bewegungen (Neigung der Poster, Lichtreflex, Einblenden, Herz-Puls, gleitende Linse, Übergang zur Detailseite) sind auf
+  Standbildern nicht zu sehen und wurden nicht von Hand geprüft. „Bewegung reduzieren“ (macOS) und „Leichte Effekte“
+  schalten sie ab; auf Intel-Macs mit integrierter Grafik ist „Leichte Effekte“ voreingestellt.
+- Auf Macs ohne vollwertige Metal-Grafik (virtuelle Maschinen) verzichtet die App auf Schatten und Weichzeichner.
 
 ## Nicht auf echter Hardware geprüft
 Siehe TESTBERICHT.md, Abschnitt „Nicht geprüft“: Bedienung von Hand, echte USB-Sticks, SD-Karten, externe SSDs,
