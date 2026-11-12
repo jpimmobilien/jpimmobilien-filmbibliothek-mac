@@ -92,6 +92,10 @@ enum SnapshotRunner {
             },
             // Schmales Fenster: Navigation nur mit Symbolen, Abstand zu den Fensterknöpfen
             Shot(name: "13-schmales-fenster", size: CGSize(width: 740, height: 600)) { m, _ in m.navigate(.overview) },
+            Shot(name: "14-schmales-fenster-filme", size: CGSize(width: 740, height: 600)) { m, s in
+                s.viewMode = .largeGrid
+                m.navigate(.library(.all))
+            },
             Shot(name: "20-einstellungen", size: CGSize(width: 860, height: 640), prepare: { _, _ in SettingsOpener.open() }, window: .settings),
         ]
         if let f = firstNative {

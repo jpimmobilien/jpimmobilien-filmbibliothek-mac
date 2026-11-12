@@ -29,7 +29,7 @@ struct LocationsView: View {
                     }
                 }
                 kindsCard
-                HintBar(text: "Die Filmbibliothek sieht nur Ordner, die Sie hier hinzufügen, und darf sie nur lesen (App-Sandbox). macOS merkt sich die Freigabe dauerhaft. Wird ein Laufwerk abgezogen, bleiben seine Filme mit Titelbild und Fortschritt erhalten und werden beim nächsten Anschließen an der Laufwerkskennung wiedererkannt.")
+                HintBar(text: "Die Filmbibliothek sieht nur Ordner, die Sie hier hinzufügen, und darf sie nur lesen (App-Sandbox). macOS merkt sich die Freigabe (nach einem Update der App kann eine einmalige Bestätigung nötig sein – „Freigaben erneuern …“ auf „Start“). Wird ein Laufwerk abgezogen, bleiben seine Filme mit Titelbild und Fortschritt erhalten und werden beim nächsten Anschließen an der Laufwerkskennung wiedererkannt.")
             }
             .padding(.horizontal, 32)
             .padding(.top, 4)

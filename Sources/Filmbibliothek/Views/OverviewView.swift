@@ -293,10 +293,11 @@ struct HeroCard: View {
             RadialGradient(colors: [(tint ?? p.accent).opacity(0.35), .clear], center: UnitPoint(x: 0.82, y: 0.5), startRadius: 0, endRadius: 360)
                 .blendMode(.plusLighter)
                 .opacity(0.8)
-            HStack(alignment: .center, spacing: 28) {
-                info
-                Spacer(minLength: 0)
-                poster
+            // Breite Fenster: Angaben + großes Plakat; mittlere: kleineres Plakat; schmale: nur die Angaben
+            ViewThatFits(in: .horizontal) {
+                heroRow(posterWidth: settings.tileShape == .widescreen ? 380 : 186)
+                heroRow(posterWidth: settings.tileShape == .widescreen ? 250 : 130)
+                info.frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 32)
             .padding(.vertical, 26)
@@ -315,7 +316,7 @@ struct HeroCard: View {
 
     private var info: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(film.playbackStatus == .inProgress ? "WEITERSCHAUEN" : "NEU IN DEINER BIBLIOTHEK")
+            Text(film.playbackStatus == .inProgress ? "WEITERSCHAUEN" : "NEU IN DER BIBLIOTHEK")
                 .font(.system(size: 11, weight: .bold)).tracking(1.4)
                 .foregroundColor(.white.opacity(0.72))
             Text(settings.displayTitle(film))
@@ -329,6 +330,8 @@ struct HeroCard: View {
                     Text(c)
                         .font(.system(size: 11.5, weight: .semibold))
                         .foregroundColor(.white.opacity(0.92))
+                        .lineLimit(1)
+                        .fixedSize()
                         .padding(.horizontal, 9).padding(.vertical, 4)
                         .glassCapsule(kind: .overlay, interactive: false)
                 }
@@ -361,12 +364,22 @@ struct HeroCard: View {
         .frame(maxWidth: 560, alignment: .leading)
     }
 
+    /// Eine Zeile aus Angaben und Plakat. Die Angaben melden eine feste Idealbreite, damit „ViewThatFits“ je nach
+    /// Fensterbreite die passende Variante wählt (lange Titel verkleinern sich statt das Plakat zu verdrängen).
+    private func heroRow(posterWidth: CGFloat) -> some View {
+        HStack(alignment: .center, spacing: 28) {
+            info.frame(minWidth: 300, idealWidth: 400, maxWidth: 560, alignment: .leading)
+            Spacer(minLength: 0)
+            poster(width: posterWidth)
+        }
+    }
+
     /// Großes Plakat mit Tiefe; neigt sich bei voller Bewegung minimal beim Darüberfahren
-    private var poster: some View {
+    private func poster(width: CGFloat) -> some View {
         let widescreen = settings.tileShape == .widescreen
         let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
         return CoverImage(film: film, aspect: widescreen ? 16.0 / 9.0 : 2.0 / 3.0)
-            .frame(width: widescreen ? 380 : 186)
+            .frame(width: width)
             .clipShape(shape)
             .overlay(shape.strokeBorder(Color.white.opacity(0.2), lineWidth: 0.8))
             .overlay(LinearGradient(colors: [Color.white.opacity(0.16), .clear], startPoint: .top, endPoint: .center).clipShape(shape).allowsHitTesting(false))
@@ -375,7 +388,6 @@ struct HeroCard: View {
             .scaleEffect(motionFull && hover ? 1.02 : 1)
             .animation(Motion.posterSpring, value: hover)
             .onTapGesture { model.navigate(.detail(film.id)) }
-            .layoutPriority(-1)
     }
 
     private var chips: [String] {

@@ -117,15 +117,17 @@ struct LargeTitleHeader<Tools: View, Below: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center, spacing: 16) {
-                Text(title)
-                    .font(Typo.pageTitle)
-                    .foregroundColor(p.textPrimary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .layoutPriority(1)
-                Spacer(minLength: 12)
-                tools()
+            // Passt die Werkzeugleiste nicht neben den Titel, rückt sie darunter (schmale Fenster)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 16) {
+                    titleText
+                    Spacer(minLength: 12)
+                    tools()
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    titleText
+                    tools()
+                }
             }
             below()
             if !subtitle.isEmpty {
@@ -136,6 +138,14 @@ struct LargeTitleHeader<Tools: View, Below: View>: View {
                     .padding(.leading, 2)
             }
         }
+    }
+
+    private var titleText: some View {
+        Text(title)
+            .font(Typo.pageTitle)
+            .foregroundColor(p.textPrimary)
+            .lineLimit(1)
+            .fixedSize()
     }
 }
 

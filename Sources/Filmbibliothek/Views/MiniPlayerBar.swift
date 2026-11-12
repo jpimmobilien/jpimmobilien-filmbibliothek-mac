@@ -235,6 +235,7 @@ struct MiniPlayerBar: View {
         .fixedSize()
         .padding(.horizontal, 12)
         .frame(height: 30)
+        .background(Capsule(style: .continuous).fill(p.control))
         .glassCapsule(kind: .control)
         .help("Wiedergabe-Geschwindigkeit")
     }
