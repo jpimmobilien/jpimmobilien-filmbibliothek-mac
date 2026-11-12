@@ -82,8 +82,21 @@ final class DiskImage {
 
     func detach(force: Bool = false) throws {
         guard let mp = mountPoint else { return }
-        try Self.hdiutil(["detach", mp.path] + (force ? ["-force"] : []))
+        do {
+            try Self.hdiutil(["detach", mp.path] + (force ? ["-force"] : []))
+        } catch {
+            // Bereits ausgehängt (auf den Intel-VMs von GitHub beobachtet: „detach failed – No such file or directory“)
+            // ist kein Fehler des Prüflings; sonst einmal mit Gewalt wiederholen.
+            if !Self.isMounted(mp) { mountPoint = nil; return }
+            Thread.sleep(forTimeInterval: 1)
+            if Self.isMounted(mp) { try Self.hdiutil(["detach", mp.path, "-force"]) }
+        }
         mountPoint = nil
+    }
+
+    static func isMounted(_ mp: URL) -> Bool {
+        let paths = (FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: []) ?? []).map(\.standardizedFileURL.path)
+        return paths.contains(mp.standardizedFileURL.path)
     }
 
     deinit {
