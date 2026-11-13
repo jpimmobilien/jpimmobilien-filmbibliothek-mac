@@ -1,6 +1,6 @@
-# Testbericht – Filmbibliothek für macOS 1.1.0
+# Testbericht – Filmbibliothek für macOS 1.1.1
 
-Stand: GitHub-Actions-Lauf 19 vom 13.11.2026 (Commit `38bbd4e`).
+Stand: GitHub-Actions-Lauf 22 vom 13.11.2026 (Commit `b6e8c6e`) – alle Jobs grün.
 Alle Prüfungen laufen automatisch auf **virtuellen Macs von GitHub**. Es wurde **nichts von Hand auf einem echten
 Mac bedient** – siehe „Nicht geprüft“.
 
@@ -9,8 +9,9 @@ Mac bedient** – siehe „Nicht geprüft“.
 | Umgebung | Prozessor | Was dort lief |
 |---|---|---|
 | macOS 26.7.2, Xcode 26.6 | Apple Silicon (VM) | Build, 69 Tests, Sandbox-Ablauf, 36 Vorschaubilder mit echtem Liquid Glass + 34 mit Nachbildung, Messlauf 5.022 Dateien, Xcode-Projekt-Build, DMG – **bestanden** |
-| macOS 15, Xcode 26.3 | Intel x86_64 (VM) | App kompiliert, 69 Tests nativ in x86_64 |
-| macOS 15 Apple Silicon und Rosetta | – | **In 1.1 nicht gelaufen:** GitHub hatte über Stunden keine Apple-Silicon-Rechner frei („capacity constraints“). In 1.0 bestanden. |
+| macOS 15 | Apple Silicon (VM) | App aus der DMG installiert, Sandbox-Ablauf, 34 Vorschaubilder (Nachbildung) – **bestanden** |
+| macOS 15 über Rosetta 2 | x86_64-Code auf Apple Silicon | derselbe Sandbox-Ablauf und 34 Vorschaubilder mit dem Intel-Teil der App – **bestanden** |
+| macOS 15, Xcode 26.3 | Intel x86_64 (VM) | App kompiliert, 69 Tests nativ in x86_64 – **bestanden** |
 
 Hinweis: Auf den virtuellen Macs von GitHub ist „Bewegung reduzieren“ eingeschaltet. Die Vorschaubilder zeigen deshalb
 die ruhige Variante (ohne Neigung und Lichtreflex) – genau die Darstellung, die auch Nutzer mit dieser Einstellung sehen.
@@ -23,7 +24,7 @@ die ruhige Variante (ohne Neigung und Lichtreflex) – genau die Darstellung, di
 `files.bookmarks.app-scope`. Gatekeeper (`spctl`) lehnt ab – erwartbar ohne Developer ID. DMG 38 MB,
 `hdiutil verify` gültig. SHA-256 siehe `.sha256`-Datei.
 
-**Automatische Tests (69)** – auf Apple Silicon (macOS 26) alle bestanden; auf Intel (x86_64 nativ) in den Läufen 14–18 alle bestanden, in Lauf 19 einer mit einem Aushäng-Fehler der Test-VM (siehe „Befunde“)
+**Automatische Tests (69, alle bestanden auf Apple Silicon und auf Intel)**
 - Kernlogik: Titelbereinigung, Formate, Pfade, Suche (UND, Ausschluss, Anführungszeichen, Unicode), Filter,
   Sortierung, Fortsetzen-Regeln, Warteschlange/Zufall, Abgleich beim Durchsuchen (neu, geändert, umbenannt,
   verschoben, fehlend, wieder da, unlesbarer Ordner), Laufwerkskennung, Poster/Untertitel, Signaturerkennung.
@@ -44,15 +45,17 @@ die ruhige Variante (ohne Neigung und Lichtreflex) – genau die Darstellung, di
 - Auswerfen während der Wiedergabe: VLCKit meldet „Die Datei ist nicht mehr erreichbar …“; AVFoundation spielt
   eine kleine, vollständig gepufferte Datei weiter (kein Absturz); erneutes Öffnen scheitert bei beiden sauber.
 
-**Sandbox-Ablauf mit der echten App (macOS 26, Apple Silicon – bestanden)**
+**Sandbox-Ablauf mit der echten App (macOS 26, macOS 15, Rosetta – jeweils bestanden)**
 1. Start mit Ordner auf einem eingebundenen Laufwerk → läuft in der Sandbox, 22 Filme, Lesezeichen gespeichert
    (8 × AVFoundation, 11 × VLCKit, 3 × nicht abspielbar = die kaputten Testdateien).
 2. Laufwerk auswerfen → erkannt, alle Filme bleiben („nicht verfügbar“).
 3. An anderem Einhängepunkt wieder einbinden → an der Kennung wiedererkannt, keiner fehlt.
 4. Beenden, Neustart ohne Ordner → Zugriff über das Lesezeichen; AVFoundation und VLCKit spielen, kaputte Datei → Meldung.
+5. **Neu in 1.1.1:** Während ein Film läuft, ohne Maus und Tastatur → die Steuerung blendet sich aus (AVFoundation und
+   VLCKit). Geprüft mit 2 s Wartezeit, weil die Testfilme nur 6 s lang sind; die Voreinstellung der App ist 5 s.
 
-**Messlauf 5.022 Dateien** (macOS 26, Apple Silicon): Durchsuchen + Analyse 11,6 s, Suche 0,3 s, alle anzeigen 0,3 s,
-Sortieren 0,14 s (die 5.000 Zusatzdateien sind leer – sie prüfen Durchsuchen und Oberfläche, nicht die Dekodierung).
+**Messlauf 5.022 Dateien** (macOS 26, Apple Silicon): Durchsuchen + Analyse 10,0 s, Suche 0,3 s, alle anzeigen 0,3 s,
+Sortieren 0,18 s (die 5.000 Zusatzdateien sind leer – sie prüfen Durchsuchen und Oberfläche, nicht die Dekodierung).
 
 **Vorschaubilder** (hell und dunkel, alle angesehen): Start mit Kinobild, Alle Filme groß/kompakt/Liste, Poster 2:3,
 Weiterschauen, Suche mit Filtern, Speicherorte, Details, kleines Fenster (960 pt), **schmales Fenster (740 pt) für Start
@@ -62,7 +65,14 @@ abgeschnittenen Inhalte.
 
 **Xcode-Projekt** (`xcodegen generate`): Release-Build erfolgreich, Universal (`x86_64 arm64`).
 
-## Befunde und Korrekturen in 1.1
+## Befunde und Korrekturen in 1.1 und 1.1.1
+- **1.1.1 – vom Nutzer gemeldet:** Die Player-Steuerung blendete sich beim Zuschauen nie aus. Ursache (schon in 1.0): Die
+  Engines melden die Zeit mehrmals pro Sekunde, und jede Meldung startete die Wartezeit neu. Jetzt wird nur beim Wechsel
+  zu „spielt“ geplant; Steuerung, Titel, Fensterknöpfe und Mauszeiger blenden nach 5 s ohne Eingabe aus. Neue
+  automatische Prüfung (Punkt 5 oben).
+- Lauf 21: Im Durchgang „Vorschaubilder mit Liquid Glass“ hing die App einmal nach Zeitüberschreitungen des
+  VLCKit-Vorschaubild-Erzeugers (Abbruch nach 20 min); der Durchgang ohne Liquid Glass im selben Lauf und Lauf 22 liefen
+  fehlerfrei. Ursache nicht geklärt – wird beobachtet.
 - Lauf 18: Im schmalen Fenster (740 pt) war das Kinobild auf „Start“ breiter als das Fenster – Werkzeugleiste und
   „Alle anzeigen“ wurden rechts abgeschnitten. Korrigiert in Lauf 19: Das Plakat wird kleiner bzw. ausgeblendet, die
   Werkzeugleiste rückt bei Platzmangel unter den Titel.
@@ -81,5 +91,5 @@ abgeschnittenen Inhalte.
   Fall mit Freigaben einer älteren Version aber nicht.
 - Bewegungen und Hover-Effekte (Neigung, Lichtreflex, Einblenden, Herz-Puls, Linse, Übergang zur Detailseite),
   Bedienung von Hand (Maus, Tastatur, Ziehen, Menüs, Vollbild).
-- macOS 15 auf Apple Silicon und Intel-Code unter Rosetta für 1.1 (keine Rechner frei, siehe oben); macOS 13 und 14.
+- macOS 13 und 14 (bietet GitHub nicht mehr an), echte Intel-Macs mit Oberfläche.
 - Echte USB-Sticks, SD-Karten, externe SSD/HDD, NAS/SMB; Ruhezustand, externe Bildschirme; große echte Sammlungen.
