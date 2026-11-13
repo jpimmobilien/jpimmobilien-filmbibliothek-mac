@@ -58,7 +58,6 @@ struct PlayerView: View {
                     topBar
                     Spacer()
                     controlCapsule
-                        .onHover { controller.pointerOnControls = $0 }
                         .padding(.horizontal, 24)
                         .padding(.bottom, 22)
                 }

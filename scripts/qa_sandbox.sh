@@ -96,6 +96,10 @@ new_lines "$M" | grep "QA-RESULT playback" | grep "engine=AVFoundation" | grep -
 if grep -q "vlckit=true" "$LOG"; then
     new_lines "$M" | grep "QA-RESULT playback" | grep "engine=VLCKit" | grep -Eq "advanced=([1-9]|0\.[5-9])" && ok "VLCKit spielt (Zeit läuft)" || fail "VLCKit-Wiedergabe"
 fi
+new_lines "$M" | grep "QA-RESULT playback" | grep "engine=AVFoundation" | grep -q "controls=aus" && ok "Steuerung blendet sich ohne Maus/Tastatur aus (AVFoundation)" || fail "Steuerung bleibt sichtbar (AVFoundation)"
+if grep -q "vlckit=true" "$LOG"; then
+    new_lines "$M" | grep "QA-RESULT playback" | grep "engine=VLCKit" | grep -v "Kaputt/" | grep -q "controls=aus" && ok "Steuerung blendet sich ohne Maus/Tastatur aus (VLCKit)" || fail "Steuerung bleibt sichtbar (VLCKit)"
+fi
 new_lines "$M" | grep "QA-RESULT playback" | grep "Kaputt/" | grep -vq "error=-" && ok "Kaputte Datei: Meldung statt Absturz" || echo "  (keine kaputte Datei abgespielt)"
 if ls "$HOME"/Library/Logs/DiagnosticReports/Filmbibliothek* >/dev/null 2>&1; then
     fail "Absturzbericht gefunden"

@@ -24,9 +24,7 @@ final class PlayerController: ObservableObject {
     @Published private(set) var activeExternalSubtitle: URL?
     @Published private(set) var subtitleText: String?
     @Published private(set) var engineName = ""
-    @Published var controlsVisible = true
-    /// Maus liegt auf der Steuerung → nicht ausblenden
-    var pointerOnControls = false { didSet { if pointerOnControls { hideTask?.cancel() } else { scheduleHide() } } }
+    @Published var controlsVisible = true { didSet { if controlsVisible != oldValue { updateWindowButtons() } } }
     @Published var resumePrompt: Double?
     @Published var errorMessage: String?
     @Published var seekFeedback: String?
@@ -185,6 +183,7 @@ final class PlayerController: ObservableObject {
 
     private func engineChanged() {
         guard let engine else { return }
+        let previousState = state
         let newState = engine.state
         if case .failed(let message) = newState, state != newState {
             // AVFoundation gescheitert? Einmal mit VLCKit versuchen (z. B. MP4 mit nicht unterstütztem Codec)
@@ -215,7 +214,14 @@ final class PlayerController: ObservableObject {
         if !cues.isEmpty { subtitleText = SubtitleParser.text(at: engine.currentTime, in: cues) }
         trackPlayback()
         updateSleepAssertion()
-        if newState == .playing { scheduleHide() } else if newState == .paused { controlsVisible = true; hideTask?.cancel() }
+        // Nur bei einem Wechsel des Zustands: Die Engines melden die Zeit mehrmals pro Sekunde – würde hier jedes Mal
+        // neu geplant, liefe die Wartezeit nie ab und die Steuerung bliebe dauerhaft sichtbar.
+        if newState == .playing && previousState != .playing {
+            scheduleHide()
+        } else if newState == .paused && previousState != .paused {
+            controlsVisible = true
+            hideTask?.cancel()
+        }
     }
 
     /// Zählt tatsächliche Wiedergabezeit (für „abgespielt“ nach 3 s und die Statistik) und speichert regelmäßig.
@@ -460,13 +466,25 @@ final class PlayerController: ObservableObject {
         scheduleHide()
     }
 
+    /// Fensterknöpfe (Schließen, Minimieren, Zoomen) zusammen mit der Steuerung ein- und ausblenden – wie im
+    /// QuickTime Player. Im Vollbild blendet macOS die Titelleiste ohnehin selbst aus.
+    private func updateWindowButtons() {
+        guard let window, !window.styleMask.contains(.fullScreen) else { return }
+        let visible = controlsVisible
+        let buttons = [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton].compactMap { window.standardWindowButton($0) }
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = visible ? 0.2 : 0.45
+            for b in buttons { b.animator().alphaValue = visible ? 1 : 0 }
+        }
+    }
+
     private func scheduleHide() {
         hideTask?.cancel()
         guard state == .playing, resumePrompt == nil, errorMessage == nil else { return }
-        let delay = model?.settings.controlsHideDelay ?? 3
+        let delay = model?.settings.controlsHideDelay ?? 5
         hideTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-            guard !Task.isCancelled, let self, self.state == .playing, self.scrubbing == nil, !self.pointerOnControls else { return }
+            guard !Task.isCancelled, let self, self.state == .playing, self.scrubbing == nil else { return }
             withAnimation(.easeInOut(duration: 0.45)) { self.controlsVisible = false }
             NSCursor.setHiddenUntilMouseMoves(true)
         }
@@ -482,7 +500,11 @@ final class PlayerController: ObservableObject {
         }
     }
 
-    func setFullScreen(_ on: Bool) { isFullScreen = on }
+    func setFullScreen(_ on: Bool) {
+        isFullScreen = on
+        // Nach dem Vollbild die Fensterknöpfe wieder zum Zustand der Steuerung passend zeigen
+        if !on { updateWindowButtons() }
+    }
 
     // MARK: - Ruhezustand während der Wiedergabe verhindern (VLCKit macht das nicht selbst)
 

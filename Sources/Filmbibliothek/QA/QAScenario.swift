@@ -110,7 +110,12 @@ enum QAScenario {
             }
             let c = model.player.controller
             let advanced = (samples.last ?? 0) - (samples.first ?? 0)
-            result("playback path=\"\(film.relativePath)\" engine=\(c?.engineName ?? "-") state=\(String(describing: c?.state ?? .idle)) advanced=\(String(format: "%.2f", advanced)) error=\(c?.errorMessage ?? "-")")
+            // Ohne Maus und Tastatur muss sich die Steuerung nach der eingestellten Zeit ausblenden
+            if c?.state == .playing {
+                try? await Task.sleep(nanoseconds: UInt64((model.settings.controlsHideDelay - 4.8 + 2.5) * 1_000_000_000))
+            }
+            let controls = c?.controlsVisible == false ? "aus" : "an"
+            result("playback path=\"\(film.relativePath)\" engine=\(c?.engineName ?? "-") state=\(String(describing: c?.state ?? .idle)) advanced=\(String(format: "%.2f", advanced)) controls=\(controls) error=\(c?.errorMessage ?? "-")")
             c?.closeImmediately()
         }
         NSApp.windows.filter { $0.title.contains("Wiedergabe") }.forEach { $0.close() }

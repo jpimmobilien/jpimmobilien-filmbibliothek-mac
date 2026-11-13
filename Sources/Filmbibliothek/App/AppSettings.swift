@@ -108,7 +108,7 @@ final class AppSettings: ObservableObject {
         resumeBehavior = str("resumeBehavior").flatMap(ResumeBehavior.init(rawValue:)) ?? .ask
         autoplayNext = bool("autoplayNext", true)
         seekStep = dbl("seekStep", 10)
-        controlsHideDelay = dbl("controlsHideDelay", 3)
+        controlsHideDelay = dbl("controlsHideDelay", 5)
         playerVolume = dbl("playerVolume", 1)
         subtitlesOnByDefault = bool("subtitlesOnByDefault", false)
         startFullScreen = bool("startFullScreen", false)

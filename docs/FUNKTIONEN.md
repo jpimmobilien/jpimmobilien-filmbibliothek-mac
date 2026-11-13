@@ -50,8 +50,10 @@ Stand der Prüfung je Funktion: siehe [TESTBERICHT.md](TESTBERICHT.md).
   Fortschritt als Verlauf; gestaffeltes Einblenden nur für sichtbare Karten nach einem Wechsel.
 - Kinobild auf „Start“: weichgezeichneter Cover-Hintergrund, Plakat mit Tiefe, Eckdaten, Fortschritt, Abspielen, Details, Favorit.
 - Detailseite: Plakat wächst beim Öffnen heraus, Angaben folgen; Bildqualitäts-Anzeige (SD · HD · Full HD · 4K · 8K).
-- Player: Wiedergabe/Pause gehen ineinander über, großer Knopf bei Pause, Zeitleiste mit Verlauf und Leuchten, Glas-Lautstärke;
-  die Steuerung bleibt sichtbar, solange die Maus darauf liegt.
+- Player: Wiedergabe/Pause gehen ineinander über, großer Knopf bei Pause, Zeitleiste mit Verlauf und Leuchten, Glas-Lautstärke.
+  Steuerung, Titel oben und die Fensterknöpfe blenden sich nach 5 s ohne Maus- oder Tastatureingabe aus (einstellbar:
+  2/3/5/8 s), der Mauszeiger ebenso; eine Mausbewegung oder Taste holt sie zurück. Beim Ziehen in der Zeitleiste und
+  bei Pause bleiben sie sichtbar.
 - Sammlungen als eigener Bereich mit Cover-Mosaik; Durchsuchen/Analyse als Glas-Kapsel mit echten Zahlen.
 - Leerzustand mit App-Symbol über einem langsam laufenden Filmstreifen; Inhalt blendet beim Start einmal weich ein.
 - „Bewegung reduzieren“ (macOS) und „Leichte Effekte“ (Einstellungen; Voreinstellung auf Intel-Macs mit integrierter Grafik)
