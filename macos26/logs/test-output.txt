@@ -1,0 +1,384 @@
+Building for debugging...
+[0/17] /Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/.build/arm64-apple-macosx/debug/FilmbibliothekPackageTests.derived/runner.swift
+[0/17] Write sources
+[6/17] Write Filmbibliothek-entitlement.plist
+[6/17] Write sources
+[10/17] Copying VLCKit.framework
+[11/17] Write swift-version-7974D3F7F03D5E95.txt
+[13/25] Compiling FBCore ContainerSniffer.swift
+[14/25] Compiling FBCore Formatting.swift
+[15/25] Compiling FBCore LibraryQuery.swift
+[16/25] Compiling FBCore Models.swift
+[17/25] Emitting module FBCore
+[18/25] Compiling FBCore ResumePolicy.swift
+[19/25] Compiling FBCore ScanDiff.swift
+[20/25] Compiling FBCore SidecarFiles.swift
+[21/28] Compiling FBCore TitleCleaner.swift
+[22/28] Compiling FBCore VideoFormats.swift
+[23/28] Compiling FBCore VolumeIdentity.swift
+[24/33] Emitting module FBStore
+[25/34] Compiling FBStore Schema.swift
+[26/34] Compiling FBStore LibraryStore.swift
+[27/34] Compiling FBStore SQLite.swift
+[28/43] Compiling FBServices CoverStore.swift
+[29/43] Compiling FBServices LibraryScanner.swift
+[30/43] Compiling FBServices Locations.swift
+[31/43] Compiling FBServices MetadataService.swift
+[32/43] Compiling FBServices PlaybackEngine.swift
+[33/43] Compiling FBServices VLCPlaybackEngine.swift
+[34/43] Emitting module FBServices
+[35/45] Compiling FBServices VLCSupport.swift
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:26: warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                          `- warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:43: warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                                           `- warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[36/45] Compiling FBServices Volumes.swift
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:26: warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                          `- warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:43: warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                                           `- warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[37/65] Compiling FBStoreTests FBStoreTests.swift
+[38/65] Emitting module FBStoreTests
+[39/67] Compiling FBCoreTests FBCoreTests.swift
+[40/67] Emitting module FBCoreTests
+[41/67] Emitting module FBServicesTests
+[42/67] Compiling FBServicesTests FBServicesTests.swift
+[43/69] Compiling FilmbibliothekPackageTests runner.swift
+[44/69] Emitting module FilmbibliothekPackageTests
+[44/69] Write Objects.LinkFileList
+[45/69] Linking FilmbibliothekPackageTests
+[47/69] Emitting module Filmbibliothek
+[48/78] Compiling Filmbibliothek PlayerController.swift
+[49/78] Compiling Filmbibliothek PlayerView.swift
+[50/78] Compiling Filmbibliothek PlayerWindow.swift
+[51/78] Compiling Filmbibliothek QAScenario.swift
+[52/78] Compiling Filmbibliothek SnapshotRunner.swift
+[53/78] Compiling Filmbibliothek ChromeViews.swift
+[54/78] Compiling Filmbibliothek CollectionsView.swift
+[55/78] Compiling Filmbibliothek FilmDetailView.swift
+[56/78] Compiling Filmbibliothek FilmViews.swift
+[57/78] Compiling Filmbibliothek AppModel.swift
+[58/78] Compiling Filmbibliothek AppSettings.swift
+[59/78] Compiling Filmbibliothek FilmbibliothekApp.swift
+[60/78] Compiling Filmbibliothek QA.swift
+[61/78] Compiling Filmbibliothek Components.swift
+[62/78] Compiling Filmbibliothek CoverColors.swift
+[63/78] Compiling Filmbibliothek Glass.swift
+[64/78] Compiling Filmbibliothek Motion.swift
+[65/78] Compiling Filmbibliothek RenderSafety.swift
+[66/78] Compiling Filmbibliothek Theme.swift
+[67/78] Compiling Filmbibliothek FilterPanel.swift
+[68/78] Compiling Filmbibliothek LibraryView.swift
+[69/78] Compiling Filmbibliothek LocationsView.swift
+[70/78] Compiling Filmbibliothek MainView.swift
+[71/78] Compiling Filmbibliothek MiniPlayerBar.swift
+[72/78] Compiling Filmbibliothek NavBar.swift
+[73/78] Compiling Filmbibliothek OverviewView.swift
+[74/78] Compiling Filmbibliothek SettingsView.swift
+[75/78] Compiling Filmbibliothek SidebarView.swift
+[75/78] Write Objects.LinkFileList
+[76/78] Linking Filmbibliothek
+[77/78] Applying Filmbibliothek
+Build complete! (37.35s)
+▸ VLCKit in FilmbibliothekPackageTests.xctest kopiert
+[0/1] Planning build
+Test Suite 'All tests' started at 2026-11-13 07:32:37.164.
+Test Suite 'FilmbibliothekPackageTests.xctest' started at 2026-11-13 07:32:37.165.
+Test Suite 'ContainerSnifferTests' started at 2026-11-13 07:32:37.165.
+Test Case '-[FBCoreTests.ContainerSnifferTests testOtherDataIsNotRecognized]' started.
+Test Case '-[FBCoreTests.ContainerSnifferTests testOtherDataIsNotRecognized]' passed (0.002 seconds).
+Test Case '-[FBCoreTests.ContainerSnifferTests testProgramStream]' started.
+Test Case '-[FBCoreTests.ContainerSnifferTests testProgramStream]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.ContainerSnifferTests testTransportStreams]' started.
+Test Case '-[FBCoreTests.ContainerSnifferTests testTransportStreams]' passed (0.000 seconds).
+Test Suite 'ContainerSnifferTests' passed at 2026-11-13 07:32:37.169.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'FormattingTests' started at 2026-11-13 07:32:37.169.
+Test Case '-[FBCoreTests.FormattingTests testAspectAndCodecs]' started.
+Test Case '-[FBCoreTests.FormattingTests testAspectAndCodecs]' passed (0.004 seconds).
+Test Case '-[FBCoreTests.FormattingTests testClockAndRuntime]' started.
+Test Case '-[FBCoreTests.FormattingTests testClockAndRuntime]' passed (0.000 seconds).
+Test Suite 'FormattingTests' passed at 2026-11-13 07:32:37.173.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
+Test Suite 'LibraryStoreTests' started at 2026-11-13 07:32:37.173.
+Test Case '-[FBStoreTests.LibraryStoreTests testCollectionsKeepOrderAndIgnoreDuplicates]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testCollectionsKeepOrderAndIgnoreDuplicates]' passed (0.002 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testConcurrentAccess]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testConcurrentAccess]' passed (0.066 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testDeleteLocationCascades]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testDeleteLocationCascades]' passed (0.001 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testDuplicateLocationRejectedByDatabase]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testDuplicateLocationRejectedByDatabase]' passed (0.001 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testMetadataQueueOnlyForCurrentLocations]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testMetadataQueueOnlyForCurrentLocations]' passed (0.002 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testMissingIsKeptAndCanReappear]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testMissingIsKeptAndCanReappear]' passed (0.001 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testNewerSchemaIsRefused]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testNewerSchemaIsRefused]' passed (0.059 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testPersistenceOnDisk]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testPersistenceOnDisk]' passed (0.013 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testPlaybackHistoryAndFinished]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testPlaybackHistoryAndFinished]' passed (0.001 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testRemoveMissingOnlyRemovesMissing]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testRemoveMissingOnlyRemovesMissing]' passed (0.002 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testScanInsertUpdateMoveKeepsUserData]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testScanInsertUpdateMoveKeepsUserData]' passed (0.001 seconds).
+Test Case '-[FBStoreTests.LibraryStoreTests testSchemaAndIntegrity]' started.
+Test Case '-[FBStoreTests.LibraryStoreTests testSchemaAndIntegrity]' passed (0.002 seconds).
+Test Suite 'LibraryStoreTests' passed at 2026-11-13 07:32:37.327.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 0.151 (0.153) seconds
+Test Suite 'MetadataTests' started at 2026-11-13 07:32:37.327.
+Test Case '-[FBServicesTests.MetadataTests testAVFoundationReadsAppleFormats]' started.
+Test Case '-[FBServicesTests.MetadataTests testAVFoundationReadsAppleFormats]' passed (0.255 seconds).
+Test Case '-[FBServicesTests.MetadataTests testAVFoundationRejectsCorruptFiles]' started.
+Test Case '-[FBServicesTests.MetadataTests testAVFoundationRejectsCorruptFiles]' passed (0.005 seconds).
+Test Case '-[FBServicesTests.MetadataTests testFileGoneDuringProbeIsRetriedLater]' started.
+Test Case '-[FBServicesTests.MetadataTests testFileGoneDuringProbeIsRetriedLater]' passed (0.002 seconds).
+Test Case '-[FBServicesTests.MetadataTests testMetadataServiceClassifiesAndMakesCovers]' started.
+IOServiceMatchingfailed for: AppleM2ScalerParavirtDriver
+2026-11-13 07:32:48.977 xctest[10343:32717] short file detected
+2026-11-13 07:32:48.977 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:32:50.865 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:32:59.130 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:33:05.357 xctest[10343:32717] short file detected
+2026-11-13 07:33:05.358 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:33:07.371 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:33:15.374 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:33:21.518 xctest[10343:32717] short file detected
+2026-11-13 07:33:21.518 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:33:23.499 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:33:31.529 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+Test Case '-[FBServicesTests.MetadataTests testMetadataServiceClassifiesAndMakesCovers]' passed (56.482 seconds).
+Test Case '-[FBServicesTests.MetadataTests testVLCReadsOtherFormats]' started.
+2026-11-13 07:33:46.433 xctest[10343:32717] short file detected
+2026-11-13 07:33:46.434 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:33:48.425 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:33:56.526 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:34:02.780 xctest[10343:32717] short file detected
+2026-11-13 07:34:02.780 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:34:04.759 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:34:12.844 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:34:19.191 xctest[10343:32717] short file detected
+2026-11-13 07:34:19.191 xctest[10343:32717] attempting seek to 1s
+2026-11-13 07:34:21.100 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+Test Case '-[FBServicesTests.MetadataTests testVLCReadsOtherFormats]' passed (53.577 seconds).
+Test Suite 'MetadataTests' passed at 2026-11-13 07:34:27.649.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 110.321 (110.322) seconds
+Test Suite 'PlaybackTests' started at 2026-11-13 07:34:27.649.
+Test Case '-[FBServicesTests.PlaybackTests testAVFoundationPlaysMP4WithChaptersAndSeeks]' started.
+2026-11-13 07:34:29.300 xctest[10343:32717] WARNING: media thumbnailer media thumbnailing timed out
+Test Case '-[FBServicesTests.PlaybackTests testAVFoundationPlaysMP4WithChaptersAndSeeks]' passed (3.240 seconds).
+Test Case '-[FBServicesTests.PlaybackTests testEjectDuringPlaybackFailsCleanly]' started.
+2026-11-13 07:34:54.760 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:34:56.443 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:34:58.960 xctest[10343:32717] creating player instance using shared library
+Test Case '-[FBServicesTests.PlaybackTests testEjectDuringPlaybackFailsCleanly]' passed (28.313 seconds).
+Test Case '-[FBServicesTests.PlaybackTests testVLCPlaysAllNonAppleFormats]' started.
+2026-11-13 07:34:59.204 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:34:59.210 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:00.789 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:02.331 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:03.896 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:05.465 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:07.056 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:08.587 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:10.105 xctest[10343:32717] creating player instance using shared library
+2026-11-13 07:35:11.632 xctest[10343:32717] creating player instance using shared library
+Test Case '-[FBServicesTests.PlaybackTests testVLCPlaysAllNonAppleFormats]' passed (13.994 seconds).
+Test Case '-[FBServicesTests.PlaybackTests testVLCPlaysMKVWithTracks]' started.
+2026-11-13 07:35:13.199 xctest[10343:32717] creating player instance using shared library
+Test Case '-[FBServicesTests.PlaybackTests testVLCPlaysMKVWithTracks]' passed (2.524 seconds).
+Test Suite 'PlaybackTests' passed at 2026-11-13 07:35:15.722.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 48.071 (48.073) seconds
+Test Suite 'ResumeAndQueueTests' started at 2026-11-13 07:35:15.723.
+Test Case '-[FBCoreTests.ResumeAndQueueTests testQueue]' started.
+Test Case '-[FBCoreTests.ResumeAndQueueTests testQueue]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ResumeAndQueueTests testResumeRules]' started.
+Test Case '-[FBCoreTests.ResumeAndQueueTests testResumeRules]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ResumeAndQueueTests testSeekClamp]' started.
+Test Case '-[FBCoreTests.ResumeAndQueueTests testSeekClamp]' passed (0.002 seconds).
+Test Case '-[FBCoreTests.ResumeAndQueueTests testShuffleKeepsCurrentFirstAndRestores]' started.
+Test Case '-[FBCoreTests.ResumeAndQueueTests testShuffleKeepsCurrentFirstAndRestores]' passed (0.002 seconds).
+Test Suite 'ResumeAndQueueTests' passed at 2026-11-13 07:35:15.731.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.006 (0.009) seconds
+Test Suite 'ScanDiffTests' started at 2026-11-13 07:35:15.731.
+Test Case '-[FBCoreTests.ScanDiffTests testChangedContentIsUpdate]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testChangedContentIsUpdate]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testFatTimeToleranceIsUnchanged]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testFatTimeToleranceIsUnchanged]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testFirstScanInsertsAll]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testFirstScanInsertsAll]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testMissingIsMarkedNotDeleted]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testMissingIsMarkedNotDeleted]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testMoveDetectedByNameSizeTime]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testMoveDetectedByNameSizeTime]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testReappeared]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testReappeared]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testRenameDetectedByInode]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testRenameDetectedByInode]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testUnchangedRescanIsEmpty]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testUnchangedRescanIsEmpty]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.ScanDiffTests testUnreadableFolderProtectsEntries]' started.
+Test Case '-[FBCoreTests.ScanDiffTests testUnreadableFolderProtectsEntries]' passed (0.004 seconds).
+Test Suite 'ScanDiffTests' passed at 2026-11-13 07:35:15.745.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.010 (0.013) seconds
+Test Suite 'ScannerTests' started at 2026-11-13 07:35:15.745.
+Test Case '-[FBServicesTests.ScannerTests testCancelledScanChangesNothing]' started.
+Test Case '-[FBServicesTests.ScannerTests testCancelledScanChangesNothing]' passed (1.039 seconds).
+Test Case '-[FBServicesTests.ScannerTests testExcludedSubpaths]' started.
+Test Case '-[FBServicesTests.ScannerTests testExcludedSubpaths]' passed (0.013 seconds).
+Test Case '-[FBServicesTests.ScannerTests testFindsExactlyTheExpectedVideos]' started.
+Test Case '-[FBServicesTests.ScannerTests testFindsExactlyTheExpectedVideos]' passed (0.008 seconds).
+Test Case '-[FBServicesTests.ScannerTests testRescanRenameDeleteRestore]' started.
+Test Case '-[FBServicesTests.ScannerTests testRescanRenameDeleteRestore]' passed (0.018 seconds).
+Test Suite 'ScannerTests' passed at 2026-11-13 07:35:16.824.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 1.078 (1.079) seconds
+Test Suite 'SearchFilterSortTests' started at 2026-11-13 07:35:16.824.
+Test Case '-[FBCoreTests.SearchFilterSortTests testAndSearchWithExclusion]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testAndSearchWithExclusion]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.SearchFilterSortTests testFilters]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testFilters]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.SearchFilterSortTests testHaystackContainsFolderLocationAndMetadata]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testHaystackContainsFolderLocationAndMetadata]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.SearchFilterSortTests testNaturalSortAndTies]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testNaturalSortAndTies]' passed (0.004 seconds).
+Test Case '-[FBCoreTests.SearchFilterSortTests testPlaybackStatusAndScopes]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testPlaybackStatusAndScopes]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.SearchFilterSortTests testQuotedPhraseAndUnicode]' started.
+Test Case '-[FBCoreTests.SearchFilterSortTests testQuotedPhraseAndUnicode]' passed (0.003 seconds).
+Test Suite 'SearchFilterSortTests' passed at 2026-11-13 07:35:16.835.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.010 (0.011) seconds
+Test Suite 'TitleAndPathTests' started at 2026-11-13 07:35:16.835.
+Test Case '-[FBCoreTests.TitleAndPathTests testFormats]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testFormats]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testHeartMarker]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testHeartMarker]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testPlainNameStaysComplete]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testPlainNameStaysComplete]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testRelativePaths]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testRelativePaths]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testResolutionClasses]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testResolutionClasses]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testScanRules]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testScanRules]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testSceneNameIsCleaned]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testSceneNameIsCleaned]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.TitleAndPathTests testYearInParentheses]' started.
+Test Case '-[FBCoreTests.TitleAndPathTests testYearInParentheses]' passed (0.000 seconds).
+Test Suite 'TitleAndPathTests' passed at 2026-11-13 07:35:16.837.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'VolumeAndSidecarTests' started at 2026-11-13 07:35:16.837.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testFingerprintIsNotNameOnlyWhenFactsExist]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testFingerprintIsNotNameOnlyWhenFactsExist]' passed (0.001 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testKinds]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testKinds]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testNetworkIdentityWithoutCredentials]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testNetworkIdentityWithoutCredentials]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testPosterOnlyForSingleFilmFolders]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testPosterOnlyForSingleFilmFolders]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testSubtitleCandidates]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testSubtitleCandidates]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testSubtitleParser]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testSubtitleParser]' passed (0.000 seconds).
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testVolumeIdentityPrefersUUID]' started.
+Test Case '-[FBCoreTests.VolumeAndSidecarTests testVolumeIdentityPrefersUUID]' passed (0.000 seconds).
+Test Suite 'VolumeAndSidecarTests' passed at 2026-11-13 07:35:16.840.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'VolumeTests' started at 2026-11-13 07:35:16.840.
+Test Case '-[FBServicesTests.VolumeTests testAPFS]' started.
+Test Case '-[FBServicesTests.VolumeTests testAPFS]' passed (2.266 seconds).
+Test Case '-[FBServicesTests.VolumeTests testEjectDuringScanMarksNothingMissing]' started.
+Test Case '-[FBServicesTests.VolumeTests testEjectDuringScanMarksNothingMissing]' passed (2.551 seconds).
+Test Case '-[FBServicesTests.VolumeTests testExFAT]' started.
+Test Case '-[FBServicesTests.VolumeTests testExFAT]' passed (3.028 seconds).
+Test Case '-[FBServicesTests.VolumeTests testFAT32]' started.
+Test Case '-[FBServicesTests.VolumeTests testFAT32]' passed (3.099 seconds).
+Test Case '-[FBServicesTests.VolumeTests testFolderMissingOnMountedVolume]' started.
+Test Case '-[FBServicesTests.VolumeTests testFolderMissingOnMountedVolume]' passed (1.647 seconds).
+Test Suite 'VolumeTests' passed at 2026-11-13 07:35:29.433.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 12.591 (12.593) seconds
+Test Suite 'FilmbibliothekPackageTests.xctest' passed at 2026-11-13 07:35:29.433.
+	 Executed 69 tests, with 0 failures (0 unexpected) in 172.249 (172.268) seconds
+Test Suite 'All tests' passed at 2026-11-13 07:35:29.433.
+	 Executed 69 tests, with 0 failures (0 unexpected) in 172.249 (172.270) seconds
+Metadaten Kaputt/Abgeschnitten.mkv: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Kaputt/Leere Datei.mkv: Nicht abspielbar, Cover Kein Titelbild, 0x0
+Metadaten Kaputt/Textdatei.avi: Nicht abspielbar, Cover Kein Titelbild, 0x0
+Metadaten Kaputt/Zufallsdaten.mp4: Nicht abspielbar, Cover Kein Titelbild, 0x0
+Metadaten Langer Testfilm (2026).mp4: AVFoundation (macOS), Cover Bild aus dem Video, 256x144
+Metadaten Mit Poster/Film mit Poster.mp4: AVFoundation (macOS), Cover Posterdatei im Ordner, 320x180
+Metadaten Serien/Staffel 1/Kamera 00001.mts: VLCKit, Cover Kein Titelbild, 320x180
+Metadaten Serien/Staffel 1/Serie S01E01.mp4: AVFoundation (macOS), Cover Bild aus dem Video, 320x180
+Metadaten Serien/Staffel 1/Serie S01E02.mp4: AVFoundation (macOS), Cover Bild aus dem Video, 320x180
+Metadaten Testfilm AVI.avi: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm FLV.flv: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm M2TS.m2ts: VLCKit, Cover Kein Titelbild, 320x180
+Metadaten Testfilm M4V.m4v: AVFoundation (macOS), Cover Bild aus dem Video, 320x180
+Metadaten Testfilm MKV.mkv: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm MOV.mov: AVFoundation (macOS), Cover Bild aus dem Video, 320x180
+Metadaten Testfilm MP4 (HEVC).mp4: AVFoundation (macOS), Cover Bild aus dem Video, 320x180
+Metadaten Testfilm MP4.mp4: AVFoundation (macOS), Cover Eingebettetes Cover, 320x180
+Metadaten Testfilm MPEG.mpeg: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm MPG.mpg: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm TS.ts: VLCKit, Cover Kein Titelbild, 320x180
+Metadaten Testfilm WEBM.webm: VLCKit, Cover Bild aus dem Video, 320x180
+Metadaten Testfilm WMV.wmv: VLCKit, Cover Bild aus dem Video, 320x180
+VLC Testfilm MKV.mkv: H.264 / AAC / 25.0 fps
+VLC Testfilm AVI.avi: MPEG-4 Part 2 / MP3 / 25.0 fps
+VLC Testfilm WMV.wmv: Windows Media Video 8 / WMA 2 / 0.0 fps
+VLC Testfilm MPG.mpg: MPEG-2 / MPEG-Audio / 25.0 fps
+VLC Testfilm MPEG.mpeg: MPEG-2 / MPEG-Audio / 25.0 fps
+VLC Testfilm TS.ts: H.264 / AAC / 25.0 fps
+VLC Testfilm M2TS.m2ts: H.264 / AC-3 / 25.0 fps
+VLC Testfilm WEBM.webm: VP9 / Opus / 25.0 fps
+VLC Testfilm FLV.flv: Sorenson Spark / MP3 / 25.0 fps
+VLC Serien/Staffel 1/Kamera 00001.mts: H.264 / AC-3 / 25.0 fps
+Auswerfen während der Wiedergabe (AVFoundation) → playing
+Erneutes Öffnen nach dem Auswerfen (AVFoundation) → failed("Die Datei ist nicht mehr erreichbar – wurde das Laufwerk entfernt?")
+Auswerfen während der Wiedergabe (VLCKit) → failed("Die Datei ist nicht mehr erreichbar – wurde das Laufwerk entfernt?")
+Erneutes Öffnen nach dem Auswerfen (VLCKit) → failed("Die Datei ist nicht mehr erreichbar – wurde das Laufwerk entfernt?")
+VLC-Wiedergabe Testfilm AVI.avi: playing, 1.28 s
+VLC-Wiedergabe Testfilm WMV.wmv: playing, 1.32 s
+VLC-Wiedergabe Testfilm MPG.mpg: playing, 1.18 s
+VLC-Wiedergabe Testfilm MPEG.mpeg: playing, 1.39 s
+VLC-Wiedergabe Testfilm TS.ts: playing, 1.38 s
+VLC-Wiedergabe Testfilm M2TS.m2ts: playing, 1.44 s
+VLC-Wiedergabe Testfilm WEBM.webm: playing, 1.20 s
+VLC-Wiedergabe Testfilm FLV.flv: playing, 1.18 s
+VLC-Wiedergabe Serien/Staffel 1/Kamera 00001.mts: playing, 1.00 s
+Abbruch-Test: cancelled
+Laufwerk APFS: Kennung uuid:786FD81A-BEE5-431F-8DB1-1F00C306EE87, Art removable, Dateisystem APFS, Pfad im Laufwerk "Filme"
+Auswerfen während des Durchsuchens → completed
+Laufwerk ExFAT: Kennung uuid:E2CC6C0F-C8F0-316D-A42D-B45E7A43603D, Art removable, Dateisystem ExFAT, Pfad im Laufwerk "Filme"
+Laufwerk MS-DOS FAT32: Kennung uuid:289962C5-CB60-334D-8D45-69F253E7D172, Art removable, Dateisystem MS-DOS (FAT32), Pfad im Laufwerk "Filme"
+Ordner gelöscht auf eingebundenem Laufwerk → Ordner nicht gefunden
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -1,0 +1,13 @@
+▸ Lade VLCKit 3.7.3 …
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0 84.1M    0  239k    0     0   301k      0  0:04:45 --:--:--  0:04:45  301k 23 84.1M   23 19.3M    0     0  10.9M      0  0:00:07  0:00:01  0:00:06 10.9M 63 84.1M   63 53.3M    0     0  19.2M      0  0:00:04  0:00:02  0:00:02 19.2M100 84.1M  100 84.1M    0     0  22.9M      0  0:00:03  0:00:03 --:--:-- 22.9M
+build/vlckit-download/vlckit.tar.xz: OK
+▸ Inhalt:
+  Vendor/VLCKit.xcframework
+  Vendor/VLCKit.xcframework/macos-arm64_x86_64
+  Vendor/VLCKit.xcframework/macos-arm64_x86_64/VLCKit.framework
+  Vendor/VLCKit.xcframework/macos-arm64_x86_64/dSYMs
+  Vendor/VLCKit.xcframework/Info.plist
+▸ macos-arm64_x86_64: x86_64 arm64
+✓ VLCKit 3.7.3 in Vendor/

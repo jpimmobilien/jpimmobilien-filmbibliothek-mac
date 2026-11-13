@@ -1,0 +1,112 @@
+QA-RESULT scenario=report start
+QA-RESULT idle=true
+QA-RESULT sandbox=true arch=x86_64 translated=true glass=false vlckit=true
+QA-RESULT location name="Filme" key=uuid:AD081BA9-FF9F-4102-803A-BCBA9C9D90C6 kind=removable status=Verfügbar films=22 missing=0 bookmark=true
+QA-RESULT films total=22 native=0 vlc=0 unsupported=0 unknown=22 covers=0
+QA-RESULT film path="Kaputt/Abgeschnitten.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Leere Datei.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Textdatei.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Zufallsdaten.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Langer Testfilm (2026).mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Mit Poster/Film mit Poster.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Kamera 00001.mts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E01.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E02.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm AVI.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm FLV.flv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M2TS.m2ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M4V.m4v" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MKV.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MOV.mov" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MP4 (HEVC).mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MP4.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPEG.mpeg" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPG.mpg" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm TS.ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WEBM.webm" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WMV.wmv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT scenario=report done
+QA-RESULT sandbox=true arch=x86_64 translated=true glass=false vlckit=true
+QA-RESULT location name="Filme" key=uuid:AD081BA9-FF9F-4102-803A-BCBA9C9D90C6 kind=removable status=Nicht verfügbar films=22 missing=0 bookmark=true
+QA-RESULT films total=22 native=1 vlc=1 unsupported=0 unknown=20 covers=2
+QA-RESULT film path="Kaputt/Abgeschnitten.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Leere Datei.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Textdatei.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Zufallsdaten.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Langer Testfilm (2026).mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Mit Poster/Film mit Poster.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Kamera 00001.mts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E01.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E02.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm AVI.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm FLV.flv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M2TS.m2ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M4V.m4v" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MKV.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MOV.mov" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=HEVC (H.265) acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MP4.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPEG.mpeg" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPG.mpg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm TS.ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WEBM.webm" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WMV.wmv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT report-done
+QA-RESULT sandbox=true arch=x86_64 translated=true glass=false vlckit=true
+QA-RESULT location name="Filme" key=uuid:AD081BA9-FF9F-4102-803A-BCBA9C9D90C6 kind=removable status=Verfügbar films=22 missing=0 bookmark=true
+QA-RESULT films total=22 native=3 vlc=2 unsupported=0 unknown=17 covers=5
+QA-RESULT film path="Kaputt/Abgeschnitten.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Leere Datei.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Textdatei.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Zufallsdaten.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Langer Testfilm (2026).mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Mit Poster/Film mit Poster.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Kamera 00001.mts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E01.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E02.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm AVI.avi" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm FLV.flv" engine=VLCKit duration=6.03 size=320x180 fps=25.00 vcodec=Sorenson Spark acodec=MP3 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm M2TS.m2ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M4V.m4v" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MKV.mkv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MOV.mov" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=HEVC (H.265) acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MP4.mp4" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPEG.mpeg" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm MPG.mpg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm TS.ts" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WEBM.webm" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WMV.wmv" engine=Noch nicht geprüft duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT report-done
+QA-RESULT quit-request
+QA-RESULT scenario=playback start
+QA-RESULT idle=true
+QA-RESULT sandbox=true arch=x86_64 translated=true glass=false vlckit=true
+QA-RESULT location name="Filme" key=uuid:AD081BA9-FF9F-4102-803A-BCBA9C9D90C6 kind=removable status=Verfügbar films=22 missing=0 bookmark=true
+QA-RESULT films total=22 native=8 vlc=10 unsupported=4 unknown=0 covers=16
+QA-RESULT film path="Kaputt/Abgeschnitten.mkv" engine=VLCKit duration=6.02 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=2 subs=1 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Kaputt/Leere Datei.mkv" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Textdatei.avi" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Kaputt/Zufallsdaten.mp4" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Langer Testfilm (2026).mp4" engine=AVFoundation (macOS) duration=240.00 size=256x144 fps=5.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Mit Poster/Film mit Poster.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Posterdatei im Ordner missing=false
+QA-RESULT film path="Serien/Staffel 1/Kamera 00001.mts" engine=VLCKit duration=6.66 size=320x180 fps=25.00 vcodec=H.264 acodec=AC-3 audio=1 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E01.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Serien/Staffel 1/Serie S01E02.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm AVI.avi" engine=VLCKit duration=6.00 size=320x180 fps=25.00 vcodec=MPEG-4 Part 2 acodec=MP3 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm FLV.flv" engine=VLCKit duration=6.03 size=320x180 fps=25.00 vcodec=Sorenson Spark acodec=MP3 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm M2TS.m2ts" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm M4V.m4v" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MKV.mkv" engine=VLCKit duration=6.02 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=2 subs=1 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MOV.mov" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=HEVC (H.265) acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MP4.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=2 cover=Eingebettetes Cover missing=false
+QA-RESULT film path="Testfilm MPEG.mpeg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm MPG.mpg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm TS.ts" engine=VLCKit duration=6.66 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Kein Titelbild missing=false
+QA-RESULT film path="Testfilm WEBM.webm" engine=VLCKit duration=6.01 size=320x180 fps=25.00 vcodec=VP9 acodec=Opus audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT film path="Testfilm WMV.wmv" engine=VLCKit duration=6.04 size=320x180 fps=- vcodec=Windows Media Video 8 acodec=WMA 2 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+QA-RESULT playback path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation state=playing advanced=4.00 controls=aus error=-
+QA-RESULT playback path="Testfilm MPG.mpg" engine=VLCKit state=playing advanced=4.12 controls=aus error=-
+QA-RESULT playback path="Testfilm M2TS.m2ts" engine=VLCKit state=failed("„Testfilm M2TS.m2ts“ kann weder mit AVFoundation noch mit VLCKit geöffnet werden – die Datei ist beschädigt oder das Format wird nicht unterstützt.") advanced=0.00 controls=an error=„Testfilm M2TS.m2ts“ kann weder mit AVFoundation noch mit VLCKit geöffnet werden – die Datei ist beschädigt oder das Format wird nicht unterstützt.
+QA-RESULT scenario=playback done

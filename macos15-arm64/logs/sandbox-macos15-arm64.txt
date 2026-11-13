@@ -1,0 +1,41 @@
+▸ Testlaufwerk: /Volumes/FB QA Filme
+▸ Entitlements der App:
+  [Dict]
+  	[Key] com.apple.security.app-sandbox
+  	[Value]
+  		[Bool] true
+  	[Key] com.apple.security.files.bookmarks.app-scope
+  	[Value]
+  		[Bool] true
+  	[Key] com.apple.security.files.user-selected.read-only
+  	[Value]
+  		[Bool] true
+▸ 1. Start mit Ordner (Öffnen-Ereignis)
+✓ Bericht 1
+✓ App läuft in der Sandbox
+✓ 22 Filme gefunden, Speicherort verfügbar
+✓ Lesezeichen gespeichert
+2026-11-13 07:43:51.240 Df Filmbibliothek[1404:1c9e] [de.privateapp.filmbibliothek:app] QA-RESULT films total=22 native=1 vlc=1 unsupported=0 unknown=20 covers=2
+▸ 2. Laufwerk auswerfen
+✓ Auswerfen erkannt
+✓ Bericht 2
+✓ Filme bleiben erhalten (nicht verfügbar)
+▸ 3. Wieder einbinden an anderem Einhängepunkt
+✓ an der Kennung wiedererkannt (anderer Einhängepunkt)
+2026-11-13 07:43:59.247 Df Filmbibliothek[1404:1c9e] [de.privateapp.filmbibliothek:app] Speicherort verfügbar: Filme [uuid:4C3776C6-32B6-423D-925A-31A965C74AED] → /private/var/folders/2s/vty41l455yv698g4xkgfv7z00000gn/T/tmp.BQ39pZCyRW/anderer-ort/Filme
+✓ Bericht 3
+✓ alle Filme wieder verfügbar, keiner fehlt
+▸ 4. Beenden und Neustart ohne Ordner (Lesezeichen)
+✓ App sauber beendet
+✓ Wiedergabe-Ablauf
+✓ Zugriff nach Neustart über das gespeicherte Lesezeichen
+  playback path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation state=playing advanced=4.25 controls=aus error=-
+  playback path="Testfilm MPG.mpg" engine=VLCKit state=playing advanced=4.11 controls=aus error=-
+  playback path="Kaputt/Leere Datei.mkv" engine=VLCKit state=failed("„Leere Datei.mkv“ kann weder mit AVFoundation noch mit VLCKit geöffnet werden – die Datei ist beschädigt oder das Format wird nicht unterstützt.") advanced=0.00 controls=an error=„Leere Datei.mkv“ kann weder mit AVFoundation noch mit VLCKit geöffnet werden – die Datei ist beschädigt oder das Format wird nicht unterstützt.
+✓ AVFoundation spielt (Zeit läuft)
+✓ VLCKit spielt (Zeit läuft)
+✓ Steuerung blendet sich ohne Maus/Tastatur aus (AVFoundation)
+✓ Steuerung blendet sich ohne Maus/Tastatur aus (VLCKit)
+✓ Kaputte Datei: Meldung statt Absturz
+▸ Ergebnis: bestanden
+scripts/qa_sandbox.sh: line 110:  1286 Terminated: 15          log stream --style compact --level info --predicate 'subsystem == "de.privateapp.filmbibliothek"' > "$LOG" 2>&1

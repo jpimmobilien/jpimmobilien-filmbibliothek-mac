@@ -1,0 +1,83 @@
+[FB] Start: macOS Version 15.8.2 (Build 24H232), x86_64, Glas-Nachbildung (NSVisualEffectView), VLCKit: true, Grafik: Apple Paravirtual device, reduzierte Effekte: true
+[Snapshot] Ausgabe: /Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/snapshots/macos15-rosetta-x86_64
+[FB] Speicherort hinzugefügt: Filme [uuid:7367B1B5-A657-419E-8D57-2ED0A905A876] Pfad im Laufwerk: "var/folders/2s/vty41l455yv698g4xkgfv7z00000gn/T/tmp.TKmQpFacwG/Filme" Art: internal
+[FB] Speicherort verfügbar: Filme [uuid:7367B1B5-A657-419E-8D57-2ED0A905A876] → /private/var/folders/2s/vty41l455yv698g4xkgfv7z00000gn/T/tmp.TKmQpFacwG/Filme
+[FB] Durchsuchen beginnt: Filme
+[FB] Durchsuchen beendet: Filme – completed neu 22, geändert 0, verschoben 0, fehlend 0, wieder da 0, unverändert 0, Ordner ohne Zugriff 0, 0.01 s
+2026-11-13 07:45:17.079 Filmbibliothek[3975:16790] short file detected
+2026-11-13 07:45:17.079 Filmbibliothek[3975:16790] attempting seek to 1s
+2026-11-13 07:45:19.092 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:45:27.151 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:45:33.302 Filmbibliothek[3975:16790] short file detected
+2026-11-13 07:45:33.303 Filmbibliothek[3975:16790] attempting seek to 1s
+2026-11-13 07:45:33.308 Filmbibliothek[3975:16790] short file detected
+2026-11-13 07:45:33.308 Filmbibliothek[3975:16790] attempting seek to 1s
+2026-11-13 07:45:35.311 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:45:35.312 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:45:43.379 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+2026-11-13 07:45:43.380 Filmbibliothek[3975:16790] WARNING: media thumbnailer media thumbnailing timed out
+[Snapshot] Bibliothek bereit: true, 22 Filme
+[FB] QA-RESULT sandbox=false arch=x86_64 translated=true glass=false vlckit=true
+[FB] QA-RESULT location name="Filme" key=uuid:7367B1B5-A657-419E-8D57-2ED0A905A876 kind=internal status=Verfügbar films=22 missing=0 bookmark=true
+[FB] QA-RESULT films total=22 native=8 vlc=11 unsupported=3 unknown=0 covers=16
+[FB] QA-RESULT film path="Kaputt/Abgeschnitten.mkv" engine=VLCKit duration=6.02 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=2 subs=1 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Kaputt/Leere Datei.mkv" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Kaputt/Textdatei.avi" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Kaputt/Zufallsdaten.mp4" engine=Nicht abspielbar duration=- size=0x0 fps=- vcodec=- acodec=- audio=0 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Langer Testfilm (2026).mp4" engine=AVFoundation (macOS) duration=240.00 size=256x144 fps=5.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Mit Poster/Film mit Poster.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Posterdatei im Ordner missing=false
+[FB] QA-RESULT film path="Serien/Staffel 1/Kamera 00001.mts" engine=VLCKit duration=6.66 size=320x180 fps=25.00 vcodec=H.264 acodec=AC-3 audio=1 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Serien/Staffel 1/Serie S01E01.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Serien/Staffel 1/Serie S01E02.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm AVI.avi" engine=VLCKit duration=6.00 size=320x180 fps=25.00 vcodec=MPEG-4 Part 2 acodec=MP3 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm FLV.flv" engine=VLCKit duration=6.03 size=320x180 fps=25.00 vcodec=Sorenson Spark acodec=MP3 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm M2TS.m2ts" engine=VLCKit duration=6.66 size=320x180 fps=25.00 vcodec=H.264 acodec=AC-3 audio=1 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Testfilm M4V.m4v" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm MKV.mkv" engine=VLCKit duration=6.02 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=2 subs=1 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm MOV.mov" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm MP4 (HEVC).mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=HEVC (H.265) acodec=AAC audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm MP4.mp4" engine=AVFoundation (macOS) duration=6.00 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=2 cover=Eingebettetes Cover missing=false
+[FB] QA-RESULT film path="Testfilm MPEG.mpeg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm MPG.mpg" engine=VLCKit duration=5.98 size=320x180 fps=25.00 vcodec=MPEG-2 acodec=MPEG-Audio audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm TS.ts" engine=VLCKit duration=6.66 size=320x180 fps=25.00 vcodec=H.264 acodec=AAC audio=1 subs=0 chapters=0 cover=Kein Titelbild missing=false
+[FB] QA-RESULT film path="Testfilm WEBM.webm" engine=VLCKit duration=6.01 size=320x180 fps=25.00 vcodec=VP9 acodec=Opus audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+[FB] QA-RESULT film path="Testfilm WMV.wmv" engine=VLCKit duration=6.04 size=320x180 fps=- vcodec=Windows Media Video 8 acodec=WMA 2 audio=1 subs=0 chapters=0 cover=Bild aus dem Video missing=false
+2026-11-13 07:46:44.266 Filmbibliothek[3975:16790] creating player instance using shared library
+2026-11-13 07:47:36.051 Filmbibliothek[3975:16790] creating player instance using shared library
+[Snapshot] Wiedergabe für „Weiterschauen“: Langer Testfilm (2026).mp4
+[Snapshot] 01-uebersicht-dunkel.png: window-server
+[Snapshot] 02-alle-filme-gross-dunkel.png: window-server
+[Snapshot] 03-alle-filme-kompakt-dunkel.png: window-server
+[Snapshot] 04-alle-filme-liste-dunkel.png: window-server
+[Snapshot] 05-poster-2zu3-dunkel.png: window-server
+[Snapshot] 06-weiterschauen-dunkel.png: window-server
+[Snapshot] 07-suche-filter-dunkel.png: window-server
+[Snapshot] 08-speicherorte-dunkel.png: window-server
+[Snapshot] 09-details-dunkel.png: window-server
+[Snapshot] 10-kleines-fenster-dunkel.png: window-server
+[Snapshot] 11-sammlungen-dunkel.png: window-server
+[Snapshot] 13-schmales-fenster-dunkel.png: window-server
+[Snapshot] 14-schmales-fenster-filme-dunkel.png: window-server
+[Snapshot] 20-einstellungen-dunkel.png: window-server
+[Snapshot] 32-mini-player-dunkel.png: window-server
+[Snapshot] 30-player-vlc-dunkel.png: window-server
+[Snapshot] 31-player-avfoundation-dunkel.png: window-server
+[Snapshot] 01-uebersicht-hell.png: window-server
+[Snapshot] 02-alle-filme-gross-hell.png: window-server
+[Snapshot] 03-alle-filme-kompakt-hell.png: window-server
+[Snapshot] 04-alle-filme-liste-hell.png: window-server
+[Snapshot] 05-poster-2zu3-hell.png: window-server
+[Snapshot] 06-weiterschauen-hell.png: window-server
+[Snapshot] 07-suche-filter-hell.png: window-server
+[Snapshot] 08-speicherorte-hell.png: window-server
+[Snapshot] 09-details-hell.png: window-server
+[Snapshot] 10-kleines-fenster-hell.png: window-server
+[Snapshot] 11-sammlungen-hell.png: window-server
+[Snapshot] 13-schmales-fenster-hell.png: window-server
+[Snapshot] 14-schmales-fenster-filme-hell.png: window-server
+[Snapshot] 20-einstellungen-hell.png: window-server
+[Snapshot] 32-mini-player-hell.png: window-server
+[Snapshot] 30-player-vlc-hell.png: window-server
+[Snapshot] 31-player-avfoundation-hell.png: window-server
+[Snapshot] fertig: 34 Bilder
+[FB] Beendet

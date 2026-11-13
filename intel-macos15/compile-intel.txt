@@ -1,0 +1,34 @@
+Building for debugging...
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:26: warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                          `- warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:43: warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                                           `- warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:26: warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                          `- warning: 'metadata(forKey:)' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/Sources/FBServices/VLCSupport.swift:70:43: warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 68 |         }
+ 69 |         if let w = info.width, let h = info.height, w <= 0 || h <= 0 { info.width = nil; info.height = nil }
+ 70 |         if let t = media.metadata(forKey: VLCMetaInformationTitle), !t.isEmpty { info.embeddedTitle = t }
+    |                                           `- warning: 'VLCMetaInformationTitle' is deprecated [#DeprecatedDeclaration]
+ 71 |         return (info, hasVideo)
+ 72 |     }
+
+Build of product 'Filmbibliothek' complete! (68.20s)

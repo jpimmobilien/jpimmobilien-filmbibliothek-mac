@@ -1,0 +1,78 @@
+== lipo ==
+Architectures in the fat file: build/Filmbibliothek.app/Contents/MacOS/Filmbibliothek are: x86_64 arm64 
+Architectures in the fat file: build/Filmbibliothek.app/Contents/Frameworks/VLCKit.framework/VLCKit are: x86_64 arm64 
+== codesign ==
+Executable=/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/build/Filmbibliothek.app/Contents/MacOS/Filmbibliothek
+Identifier=de.privateapp.filmbibliothek
+Format=app bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20400 size=15509 flags=0x2(adhoc) hashes=474+7 location=embedded
+Signature=adhoc
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=4
+Internal requirements count=0 size=12
+== entitlements ==
+Executable=/Users/runner/work/jpimmobilien-filmbibliothek-mac/jpimmobilien-filmbibliothek-mac/build/Filmbibliothek.app/Contents/MacOS/Filmbibliothek
+[Dict]
+	[Key] com.apple.security.app-sandbox
+	[Value]
+		[Bool] true
+	[Key] com.apple.security.files.bookmarks.app-scope
+	[Value]
+		[Bool] true
+	[Key] com.apple.security.files.user-selected.read-only
+	[Value]
+		[Bool] true
+== spctl ==
+build/Filmbibliothek.app: rejected
+== Größe ==
+ 95M	build/Filmbibliothek.app
+ 38M	dist/Filmbibliothek_macOS_Universal.dmg
+== Info.plist ==
+{
+  "CFBundleDevelopmentRegion" => "de"
+  "CFBundleDisplayName" => "Filmbibliothek"
+  "CFBundleDocumentTypes" => [
+    0 => {
+      "CFBundleTypeName" => "Ordner (als Speicherort hinzufügen)"
+      "CFBundleTypeRole" => "Viewer"
+      "LSHandlerRank" => "None"
+      "LSItemContentTypes" => [
+        0 => "public.folder"
+        1 => "public.volume"
+      ]
+    }
+    1 => {
+      "CFBundleTypeName" => "Video"
+      "CFBundleTypeRole" => "Viewer"
+      "LSHandlerRank" => "Alternate"
+      "LSItemContentTypes" => [
+        0 => "public.movie"
+        1 => "public.video"
+        2 => "public.audiovisual-content"
+      ]
+    }
+  ]
+  "CFBundleExecutable" => "Filmbibliothek"
+  "CFBundleIconFile" => "AppIcon"
+  "CFBundleIdentifier" => "de.privateapp.filmbibliothek"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleLocalizations" => [
+    0 => "de"
+  ]
+  "CFBundleName" => "Filmbibliothek"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "1.1.1"
+  "CFBundleVersion" => "22"
+  "LSApplicationCategoryType" => "public.app-category.entertainment"
+  "LSArchitecturePriority" => [
+    0 => "arm64"
+    1 => "x86_64"
+  ]
+  "LSMinimumSystemVersion" => "13.0"
+  "NSHighResolutionCapable" => true
+  "NSHumanReadableCopyright" => "Filmbibliothek – private, lokale Filmbibliothek. Wiedergabe mit AVFoundation und VLCKit (LGPL 2.1)."
+  "NSPrincipalClass" => "NSApplication"
+  "NSSupportsAutomaticTermination" => false
+  "NSSupportsSuddenTermination" => false
+}

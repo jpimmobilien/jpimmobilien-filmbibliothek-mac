@@ -1,0 +1,217 @@
+{
+  "architecture" : "arm64",
+  "benchmark" : {
+
+  },
+  "films" : 22,
+  "glass" : "Glas-Nachbildung (NSVisualEffectView)",
+  "images" : [
+    {
+      "appearance" : "dunkel",
+      "file" : "01-uebersicht-dunkel.png",
+      "method" : "window-server",
+      "name" : "01-uebersicht"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "02-alle-filme-gross-dunkel.png",
+      "method" : "window-server",
+      "name" : "02-alle-filme-gross"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "03-alle-filme-kompakt-dunkel.png",
+      "method" : "window-server",
+      "name" : "03-alle-filme-kompakt"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "04-alle-filme-liste-dunkel.png",
+      "method" : "window-server",
+      "name" : "04-alle-filme-liste"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "05-poster-2zu3-dunkel.png",
+      "method" : "window-server",
+      "name" : "05-poster-2zu3"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "06-weiterschauen-dunkel.png",
+      "method" : "window-server",
+      "name" : "06-weiterschauen"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "07-suche-filter-dunkel.png",
+      "method" : "window-server",
+      "name" : "07-suche-filter"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "08-speicherorte-dunkel.png",
+      "method" : "window-server",
+      "name" : "08-speicherorte"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "09-details-dunkel.png",
+      "method" : "window-server",
+      "name" : "09-details"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "10-kleines-fenster-dunkel.png",
+      "method" : "window-server",
+      "name" : "10-kleines-fenster"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "11-sammlungen-dunkel.png",
+      "method" : "window-server",
+      "name" : "11-sammlungen"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "13-schmales-fenster-dunkel.png",
+      "method" : "window-server",
+      "name" : "13-schmales-fenster"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "14-schmales-fenster-filme-dunkel.png",
+      "method" : "window-server",
+      "name" : "14-schmales-fenster-filme"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "20-einstellungen-dunkel.png",
+      "method" : "window-server",
+      "name" : "20-einstellungen"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "32-mini-player-dunkel.png",
+      "method" : "window-server",
+      "name" : "32-mini-player"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "30-player-vlc-dunkel.png",
+      "method" : "window-server",
+      "name" : "30-player-vlc"
+    },
+    {
+      "appearance" : "dunkel",
+      "file" : "31-player-avfoundation-dunkel.png",
+      "method" : "window-server",
+      "name" : "31-player-avfoundation"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "01-uebersicht-hell.png",
+      "method" : "window-server",
+      "name" : "01-uebersicht"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "02-alle-filme-gross-hell.png",
+      "method" : "window-server",
+      "name" : "02-alle-filme-gross"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "03-alle-filme-kompakt-hell.png",
+      "method" : "window-server",
+      "name" : "03-alle-filme-kompakt"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "04-alle-filme-liste-hell.png",
+      "method" : "window-server",
+      "name" : "04-alle-filme-liste"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "05-poster-2zu3-hell.png",
+      "method" : "window-server",
+      "name" : "05-poster-2zu3"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "06-weiterschauen-hell.png",
+      "method" : "window-server",
+      "name" : "06-weiterschauen"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "07-suche-filter-hell.png",
+      "method" : "window-server",
+      "name" : "07-suche-filter"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "08-speicherorte-hell.png",
+      "method" : "window-server",
+      "name" : "08-speicherorte"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "09-details-hell.png",
+      "method" : "window-server",
+      "name" : "09-details"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "10-kleines-fenster-hell.png",
+      "method" : "window-server",
+      "name" : "10-kleines-fenster"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "11-sammlungen-hell.png",
+      "method" : "window-server",
+      "name" : "11-sammlungen"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "13-schmales-fenster-hell.png",
+      "method" : "window-server",
+      "name" : "13-schmales-fenster"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "14-schmales-fenster-filme-hell.png",
+      "method" : "window-server",
+      "name" : "14-schmales-fenster-filme"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "20-einstellungen-hell.png",
+      "method" : "window-server",
+      "name" : "20-einstellungen"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "32-mini-player-hell.png",
+      "method" : "window-server",
+      "name" : "32-mini-player"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "30-player-vlc-hell.png",
+      "method" : "window-server",
+      "name" : "30-player-vlc"
+    },
+    {
+      "appearance" : "hell",
+      "file" : "31-player-avfoundation-hell.png",
+      "method" : "window-server",
+      "name" : "31-player-avfoundation"
+    }
+  ],
+  "macOS" : "Version 26.7.2 (Build 25G332)",
+  "rosetta" : false,
+  "vlckit" : "3.0.23 Vetinari (3.0.23-2-47-g4eb3701ba9)"
+}
