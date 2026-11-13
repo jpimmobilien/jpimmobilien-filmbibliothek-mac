@@ -101,20 +101,23 @@ enum QAScenario {
         if let n = model.films.first(where: { $0.playability == .native && model.isAvailable($0) }) { picks.append(n) }
         if let v = model.films.first(where: { $0.playability == .vlc && model.isAvailable($0) }) { picks.append(v) }
         if let u = model.films.first(where: { $0.playability == .unsupported }) { picks.append(u) }
+        // Ausblenden der Steuerung prüfen: Die Testfilme sind nur ~6 s lang – deshalb hier 2 s statt der Voreinstellung
+        // (der Ablauf ist derselbe; der frühere Fehler – Neustart der Wartezeit bei jeder Zeitmeldung – fiele genauso auf).
+        let savedDelay = model.settings.controlsHideDelay
+        model.settings.controlsHideDelay = 2
+        defer { model.settings.controlsHideDelay = savedDelay }
         for film in picks {
             model.play(film, in: [film], fromStart: true)
             var samples: [Double] = []
-            for _ in 0..<12 {
+            var controls = "an"
+            for i in 0..<12 {
                 try? await Task.sleep(nanoseconds: 400_000_000)
                 samples.append(model.player.controller?.time ?? -1)
+                // nach ~4,4 s: Film läuft noch, die Steuerung muss seit gut 1,5 s ausgeblendet sein
+                if i == 10 { controls = model.player.controller?.controlsVisible == false ? "aus" : "an" }
             }
             let c = model.player.controller
             let advanced = (samples.last ?? 0) - (samples.first ?? 0)
-            // Ohne Maus und Tastatur muss sich die Steuerung nach der eingestellten Zeit ausblenden
-            if c?.state == .playing {
-                try? await Task.sleep(nanoseconds: UInt64((model.settings.controlsHideDelay - 4.8 + 2.5) * 1_000_000_000))
-            }
-            let controls = c?.controlsVisible == false ? "aus" : "an"
             result("playback path=\"\(film.relativePath)\" engine=\(c?.engineName ?? "-") state=\(String(describing: c?.state ?? .idle)) advanced=\(String(format: "%.2f", advanced)) controls=\(controls) error=\(c?.errorMessage ?? "-")")
             c?.closeImmediately()
         }
